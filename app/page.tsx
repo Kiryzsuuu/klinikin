@@ -35,6 +35,9 @@ export default async function Home() {
           <span className="text-lg font-semibold text-dark">{settings.siteName}</span>
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/booking" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
+            Booking Konsultasi
+          </Link>
           <Link href="/login" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
             Masuk
           </Link>

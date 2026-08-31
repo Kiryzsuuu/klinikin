@@ -14,6 +14,13 @@ type SessionUser = {
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: "🏠" },
+  { href: "/admin/branches", label: "Manajemen Cabang", icon: "🏢" },
+  { href: "/admin/patients", label: "Data Pasien / RME", icon: "🩺" },
+  { href: "/admin/pharmacy", label: "Farmasi & Stok", icon: "💊" },
+  { href: "/admin/cashier", label: "Kasir & Invoice", icon: "🧾" },
+  { href: "/admin/bookings", label: "Booking Pasien", icon: "📅" },
+  { href: "/admin/hr", label: "SDM & Jadwal", icon: "🗓️" },
+  { href: "/admin/chat", label: "Asisten AI", icon: "✨" },
   { href: "/admin/users", label: "Manajemen User", icon: "👥" },
   { href: "/admin/settings", label: "Site Settings", icon: "⚙️" },
 ];

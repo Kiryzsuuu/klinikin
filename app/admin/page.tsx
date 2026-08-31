@@ -1,34 +1,62 @@
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
+import { Branch } from "@/models/Branch";
+import { Patient } from "@/models/Patient";
+import { Visit } from "@/models/Visit";
+import { Invoice } from "@/models/Invoice";
+import { Booking } from "@/models/Booking";
 import { Card } from "@/components/ui";
 
 export default async function AdminDashboard() {
   await connectDB();
 
-  const [total, active, verified, byRole] = await Promise.all([
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
+  const [
+    totalUsers,
+    totalBranches,
+    totalPatients,
+    visitsThisMonth,
+    revenueAgg,
+    pendingBookings,
+    byRole,
+    visitsByStatus,
+  ] = await Promise.all([
     User.countDocuments({}),
-    User.countDocuments({ isActive: true }),
-    User.countDocuments({ isEmailVerified: true }),
+    Branch.countDocuments({ isActive: true }),
+    Patient.countDocuments({ isActive: true }),
+    Visit.countDocuments({ visitDate: { $gte: startOfMonth } }),
+    Invoice.aggregate([
+      { $match: { "payment.status": "PAID", createdAt: { $gte: startOfMonth } } },
+      { $group: { _id: null, total: { $sum: "$total" } } },
+    ]),
+    Booking.countDocuments({ status: "PENDING" }),
     User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]),
+    Visit.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
   ]);
 
+  const revenueThisMonth = revenueAgg[0]?.total || 0;
+
   const stats = [
-    { label: "Total Pengguna", value: total, tone: "bg-green" },
-    { label: "Pengguna Aktif", value: active, tone: "bg-lime" },
-    { label: "Email Terverifikasi", value: verified, tone: "bg-dark" },
+    { label: "Total Cabang", value: totalBranches, tone: "bg-green" },
+    { label: "Total Pasien", value: totalPatients, tone: "bg-lime" },
+    { label: "Kunjungan Bulan Ini", value: visitsThisMonth, tone: "bg-dark" },
+    { label: "Booking Menunggu", value: pendingBookings, tone: "bg-green" },
   ];
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold text-dark">Dashboard</h1>
-        <p className="text-dark/60">Ringkasan sistem KlinikHub.</p>
+        <p className="text-dark/60">Ringkasan bisnis KlinikHub lintas cabang.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
           <Card key={s.label} className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-2xl ${s.tone} flex items-center justify-center text-white font-bold text-lg`}>
+            <div className={`w-12 h-12 rounded-2xl ${s.tone} flex items-center justify-center text-white font-bold text-lg shrink-0`}>
               {s.value}
             </div>
             <div>
@@ -39,23 +67,48 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      <Card>
-        <h2 className="font-semibold text-dark mb-4">Distribusi Role</h2>
-        <div className="space-y-2">
-          {byRole.map((r: { _id: string; count: number }) => (
-            <div key={r._id} className="flex items-center gap-3">
-              <span className="w-32 text-sm text-dark/70">{r._id}</span>
-              <div className="flex-1 h-2 bg-dark/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-green"
-                  style={{ width: `${Math.min(100, (r.count / Math.max(total, 1)) * 100)}%` }}
-                />
-              </div>
-              <span className="text-sm font-medium text-dark w-8 text-right">{r.count}</span>
-            </div>
-          ))}
-        </div>
+      <Card className="bg-dark text-white">
+        <p className="text-sm text-white/60">Pendapatan Bulan Ini (invoice lunas)</p>
+        <p className="text-3xl font-semibold text-lime mt-1">Rp {revenueThisMonth.toLocaleString("id-ID")}</p>
       </Card>
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card>
+          <h2 className="font-semibold text-dark mb-4">Distribusi Role Pengguna</h2>
+          <div className="space-y-2">
+            {byRole.map((r: { _id: string; count: number }) => (
+              <BarRow key={r._id} label={r._id} value={r.count} total={totalUsers} />
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="font-semibold text-dark mb-4">Status Kunjungan</h2>
+          <div className="space-y-2">
+            {visitsByStatus.map((v: { _id: string; count: number }) => (
+              <BarRow
+                key={v._id}
+                label={v._id}
+                value={v.count}
+                total={visitsByStatus.reduce((s: number, x: { count: number }) => s + x.count, 0)}
+              />
+            ))}
+            {visitsByStatus.length === 0 && <p className="text-dark/40 text-sm">Belum ada data kunjungan</p>}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function BarRow({ label, value, total }: { label: string; value: number; total: number }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-32 text-sm text-dark/70">{label}</span>
+      <div className="flex-1 h-2 bg-dark/10 rounded-full overflow-hidden">
+        <div className="h-full bg-green" style={{ width: `${Math.min(100, (value / Math.max(total, 1)) * 100)}%` }} />
+      </div>
+      <span className="text-sm font-medium text-dark w-8 text-right">{value}</span>
     </div>
   );
 }

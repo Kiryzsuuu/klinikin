@@ -1,0 +1,256 @@
+"use client";
+
+import { useEffect, useState, useCallback, use } from "react";
+import { Button, Card, Label, Select, Badge } from "@/components/ui";
+
+type Patient = { _id: string; name: string; medicalRecordNo: string; allergies?: string[]; phone?: string };
+type Visit = {
+  _id: string;
+  visitNo: string;
+  visitDate: string;
+  status: string;
+  subjective?: string;
+  doctorId?: { name: string };
+  branchId?: { name: string };
+  assessment?: { diagnoses?: { icdCode: string; icdDescription: string }[] };
+  aiSummary?: string;
+};
+type Branch = { _id: string; name: string; code: string };
+type Doctor = { _id: string; name: string; role: string };
+type DiagnosisSuggestion = { icdCode: string; icdDescription: string; reasoning: string; confidence: string };
+
+export default function PatientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [showNewVisit, setShowNewVisit] = useState(false);
+  const [newVisit, setNewVisit] = useState({ branchId: "", doctorId: "" });
+
+  const [summary, setSummary] = useState("");
+  const [summaryLoading, setSummaryLoading] = useState(false);
+
+  const [subjective, setSubjective] = useState("");
+  const [suggestions, setSuggestions] = useState<DiagnosisSuggestion[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [activeVisit, setActiveVisit] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/patients/${id}`);
+      const json = await res.json();
+      if (json.success) {
+        setPatient(json.data.patient);
+        setVisits(json.data.visits);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    fetch("/api/branches")
+      .then((r) => r.json())
+       
+      .then((j) => j.success && setBranches(j.data));
+    fetch("/api/admin/users?limit=100")
+      .then((r) => r.json())
+      .then((j) => {
+        if (j.success) setDoctors(j.data.filter((u: Doctor) => u.role === "DOKTER"));
+      });
+  }, []);
+
+  async function createVisit(e: React.FormEvent) {
+    e.preventDefault();
+    const res = await fetch("/api/visits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...newVisit, patientId: id }),
+    });
+    const json = await res.json();
+    if (json.success) {
+      setShowNewVisit(false);
+      load();
+    } else {
+      alert(json.error?.message);
+    }
+  }
+
+  async function getSummary() {
+    setSummaryLoading(true);
+    try {
+      const res = await fetch("/api/ai/patient-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patientId: id }),
+      });
+      const json = await res.json();
+      if (json.success) setSummary(json.data.summary);
+      else alert(json.error?.message);
+    } finally {
+      setSummaryLoading(false);
+    }
+  }
+
+  async function getSuggestions(visitId: string) {
+    if (!subjective.trim()) {
+      alert("Isi keluhan pasien dulu di kolom di bawah");
+      return;
+    }
+    setAiLoading(true);
+    setActiveVisit(visitId);
+    try {
+      const res = await fetch("/api/ai/diagnosis-suggestion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symptoms: subjective }),
+      });
+      const json = await res.json();
+      if (json.success) setSuggestions(json.data.suggestions);
+      else alert(json.error?.message);
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
+  async function applyDiagnosis(visitId: string, s: DiagnosisSuggestion) {
+    await fetch(`/api/visits/${visitId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        subjective,
+        assessment: { diagnoses: [{ icdCode: s.icdCode, icdDescription: s.icdDescription, type: "PRIMARY" }] },
+      }),
+    });
+    setSuggestions([]);
+    load();
+  }
+
+  if (loading || !patient) return <p className="text-dark/50">Memuat...</p>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-dark">{patient.name}</h1>
+          <p className="text-dark/60">No. RM {patient.medicalRecordNo} • {patient.phone}</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="ghost" onClick={getSummary} disabled={summaryLoading}>
+            {summaryLoading ? "Meringkas..." : "✨ AI Ringkasan Riwayat"}
+          </Button>
+          <Button onClick={() => setShowNewVisit(true)}>+ Kunjungan Baru</Button>
+        </div>
+      </div>
+
+      {summary && (
+        <Card className="bg-lime/10 border-lime/40">
+          <p className="text-sm font-medium text-dark mb-1">✨ Ringkasan AI</p>
+          <p className="text-sm text-dark/80">{summary}</p>
+        </Card>
+      )}
+
+      <div className="space-y-4">
+        {visits.length === 0 && <Card><p className="text-dark/50">Belum ada riwayat kunjungan.</p></Card>}
+        {visits.map((v) => (
+          <Card key={v._id}>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div>
+                <p className="font-medium text-dark">{v.visitNo}</p>
+                <p className="text-xs text-dark/50">
+                  {new Date(v.visitDate).toLocaleDateString("id-ID")} • {v.doctorId?.name} • {v.branchId?.name}
+                </p>
+              </div>
+              <Badge tone={v.status === "DONE" ? "green" : "lime"}>{v.status}</Badge>
+            </div>
+
+            {v.assessment?.diagnoses && v.assessment.diagnoses.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {v.assessment.diagnoses.map((d, i) => (
+                  <Badge key={i} tone="gray">{d.icdCode} - {d.icdDescription}</Badge>
+                ))}
+              </div>
+            )}
+
+            {v.status !== "DONE" && (
+              <div className="border-t border-dark/10 pt-3 space-y-3">
+                <div>
+                  <Label>Keluhan / Subjective (SOAP)</Label>
+                  <textarea
+                    className="w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
+                    rows={2}
+                    placeholder="Contoh: demam 2 hari, batuk berdahak, nyeri tenggorokan"
+                    onChange={(e) => setSubjective(e.target.value)}
+                  />
+                </div>
+                <Button type="button" variant="secondary" onClick={() => getSuggestions(v._id)} disabled={aiLoading}>
+                  {aiLoading && activeVisit === v._id ? "Menganalisis..." : "✨ AI Saran Diagnosis ICD-10"}
+                </Button>
+
+                {activeVisit === v._id && suggestions.length > 0 && (
+                  <div className="space-y-2 bg-bg rounded-2xl p-4">
+                    <p className="text-xs text-dark/50">Saran AI — bukan diagnosis final, dokter tetap yang memutuskan.</p>
+                    {suggestions.map((s, i) => (
+                      <div key={i} className="flex items-center justify-between gap-3 bg-white rounded-xl p-3">
+                        <div>
+                          <p className="font-medium text-dark text-sm">{s.icdCode} - {s.icdDescription}</p>
+                          <p className="text-xs text-dark/50">{s.reasoning}</p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Badge tone={s.confidence === "TINGGI" ? "green" : s.confidence === "SEDANG" ? "lime" : "gray"}>
+                            {s.confidence}
+                          </Badge>
+                          <Button type="button" onClick={() => applyDiagnosis(v._id, s)} className="!px-3 !py-1.5 text-xs">
+                            Pakai
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+
+      {showNewVisit && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <h2 className="text-xl font-semibold text-dark mb-4">Kunjungan Baru</h2>
+            <form onSubmit={createVisit} className="space-y-4">
+              <div>
+                <Label>Cabang</Label>
+                <Select required value={newVisit.branchId} onChange={(e) => setNewVisit({ ...newVisit, branchId: e.target.value })}>
+                  <option value="">Pilih cabang</option>
+                  {branches.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}
+                </Select>
+              </div>
+              <div>
+                <Label>Dokter</Label>
+                <Select required value={newVisit.doctorId} onChange={(e) => setNewVisit({ ...newVisit, doctorId: e.target.value })}>
+                  <option value="">Pilih dokter</option>
+                  {doctors.map((d) => <option key={d._id} value={d._id}>{d.name}</option>)}
+                </Select>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button type="submit" className="flex-1">Buat Kunjungan</Button>
+                <Button type="button" variant="ghost" onClick={() => setShowNewVisit(false)}>Batal</Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}
