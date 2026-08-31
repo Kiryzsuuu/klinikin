@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { generateObject } from "ai";
 import { z } from "zod";
-import { AI_MODEL } from "@/lib/ai";
+import { getAiModel } from "@/lib/ai";
 import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { object } = await generateObject({
-      model: AI_MODEL,
+      model: getAiModel(),
       schema: suggestionSchema,
       prompt: `Sebagai asisten klinis, berikan saran diagnosis ICD-10 (maksimal 5) berdasarkan gejala/keluhan pasien berikut. Ini HANYA saran pendukung, dokter tetap yang memutuskan diagnosis final.
 
@@ -47,7 +47,7 @@ ${parsed.data.vitalSigns ? `Tanda vital: ${parsed.data.vitalSigns}` : ""}`,
   } catch (err) {
     return fail(
       "AI_ERROR",
-      "Gagal mendapatkan saran diagnosis. Pastikan AI_GATEWAY_API_KEY sudah dikonfigurasi.",
+      "Gagal mendapatkan saran diagnosis. Pastikan GROQ_API_KEY dan GROQ_MODEL sudah dikonfigurasi.",
       500,
       err instanceof Error ? err.message : undefined
     );

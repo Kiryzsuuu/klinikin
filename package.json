@@ -10,6 +10,7 @@
     "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^4.0.35",
     "@ai-sdk/react": "^4.0.88",
     "ai": "^7.0.85",
     "bcryptjs": "^3.0.3",

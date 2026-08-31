@@ -1,5 +1,5 @@
 import { convertToModelMessages, streamText, UIMessage } from "ai";
-import { AI_MODEL } from "@/lib/ai";
+import { getAiModel } from "@/lib/ai";
 import { getSession } from "@/lib/auth";
 
 export const maxDuration = 30;
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
   const result = streamText({
-    model: AI_MODEL,
+    model: getAiModel(),
     system:
       "Kamu adalah asisten AI internal untuk staf KlinikHub (platform manajemen klinik multi-cabang di Indonesia). " +
       "Bantu jawab pertanyaan seputar SOP administrasi klinik, penggunaan sistem, istilah medis umum, dan kode ICD-10 secara edukatif. " +

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Patient } from "@/models/Patient";
 import { Visit } from "@/models/Visit";
-import { AI_MODEL } from "@/lib/ai";
+import { getAiModel } from "@/lib/ai";
 import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { text } = await generateText({
-      model: AI_MODEL,
+      model: getAiModel(),
       prompt: `Ringkas riwayat medis pasien berikut dalam 3-5 kalimat Bahasa Indonesia untuk membantu dokter memahami konteks pasien secara cepat sebelum konsultasi. Fokus pada pola penyakit berulang, alergi, dan hal penting lain.
 
 Nama: ${patient.name}
@@ -53,7 +53,7 @@ ${history}`,
   } catch (err) {
     return fail(
       "AI_ERROR",
-      "Gagal membuat ringkasan. Pastikan AI_GATEWAY_API_KEY sudah dikonfigurasi.",
+      "Gagal membuat ringkasan. Pastikan GROQ_API_KEY dan GROQ_MODEL sudah dikonfigurasi.",
       500,
       err instanceof Error ? err.message : undefined
     );
