@@ -1,0 +1,72 @@
+"use client";
+
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button, Card, Input, Label } from "@/components/ui";
+
+function ResetPasswordForm() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const email = params.get("email") || "";
+  const code = params.get("code") || "";
+
+  const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code, newPassword }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        setError(json.error?.message || "Gagal reset password");
+        return;
+      }
+      router.push("/login");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Card className="w-full max-w-md">
+      <h1 className="text-2xl font-semibold text-dark mb-1">Password Baru</h1>
+      <p className="text-dark/60 mb-6 text-sm">Buat password baru untuk {email}</p>
+
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div>
+          <Label htmlFor="newPassword">Password Baru</Label>
+          <Input
+            id="newPassword"
+            type="password"
+            minLength={8}
+            required
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+        </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? "Menyimpan..." : "Simpan Password"}
+        </Button>
+      </form>
+    </Card>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <main className="flex-1 flex items-center justify-center p-6">
+      <Suspense>
+        <ResetPasswordForm />
+      </Suspense>
+    </main>
+  );
+}

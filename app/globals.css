@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+:root {
+  /* Palette: https://colorhunt.co/palette/f5f5f5b9e93757d131406661 */
+  --color-bg: #f5f5f5;
+  --color-lime: #b9e937;
+  --color-green: #57d131;
+  --color-dark: #406661;
+
+  --background: var(--color-bg);
+  --foreground: var(--color-dark);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-bg: var(--color-bg);
+  --color-lime: var(--color-lime);
+  --color-green: var(--color-green);
+  --color-dark: var(--color-dark);
+  --font-display: var(--font-fredoka), "Fredoka One", cursive;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-fredoka), "Fredoka One", cursive;
+}
+
+::selection {
+  background: var(--color-lime);
+  color: var(--color-dark);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-green);
+  border-radius: 8px;
+}
