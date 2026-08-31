@@ -25,6 +25,12 @@ const patientSchema = new Schema(
     },
     photoBase64: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
+
+    // Akun Patient Portal — opsional, pasien yang dibuat lewat booking/RME
+    // tidak otomatis punya akun sampai mereka daftar sendiri di /portal/register
+    // dan mengonfirmasi via OTP (dicocokkan lewat NIK/No. RM + telepon).
+    passwordHash: { type: String, default: "" },
+    isPortalActive: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -46,6 +46,28 @@ const visitSchema = new Schema(
 
     aiSummary: { type: String, default: "" },
 
+    // Odontogram (klinik gigi) — status 32 gigi permanen, dicatat hanya saat relevan
+    dentalChart: [
+      {
+        toothNumber: { type: Number, min: 1, max: 32 },
+        status: {
+          type: String,
+          enum: ["SEHAT", "KARIES", "TAMBAL", "DICABUT", "AKAR", "IMPAKSI"],
+          default: "SEHAT",
+        },
+        note: { type: String, default: "" },
+      },
+    ],
+
+    // Skin chart (klinik kecantikan) — area kulit + kondisi yang dicatat dokter
+    skinChart: [
+      {
+        area: { type: String, required: true },
+        condition: { type: String, default: "" },
+        photoBase64: { type: String, default: "" },
+      },
+    ],
+
     satuSehatStatus: {
       isSynced: { type: Boolean, default: false },
       encounterResourceId: { type: String, default: "" },

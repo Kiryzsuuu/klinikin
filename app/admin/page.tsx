@@ -6,6 +6,7 @@ import { Visit } from "@/models/Visit";
 import { Invoice } from "@/models/Invoice";
 import { Booking } from "@/models/Booking";
 import { Card } from "@/components/ui";
+import RevenueForecast from "./RevenueForecast";
 
 export default async function AdminDashboard() {
   await connectDB();
@@ -71,6 +72,8 @@ export default async function AdminDashboard() {
         <p className="text-sm text-white/60">Pendapatan Bulan Ini (invoice lunas)</p>
         <p className="text-3xl font-semibold text-lime mt-1">Rp {revenueThisMonth.toLocaleString("id-ID")}</p>
       </Card>
+
+      <RevenueForecast />
 
       <div className="grid lg:grid-cols-2 gap-6">
         <Card>

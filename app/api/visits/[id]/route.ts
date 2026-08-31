@@ -11,6 +11,8 @@ const updateSchema = z.object({
   objective: z.object({}).passthrough().optional(),
   assessment: z.object({}).passthrough().optional(),
   plan: z.object({}).passthrough().optional(),
+  dentalChart: z.array(z.object({}).passthrough()).optional(),
+  skinChart: z.array(z.object({}).passthrough()).optional(),
 });
 
 type Params = { params: Promise<{ id: string }> };

@@ -13,7 +13,7 @@ export function generateOtpCode() {
 
 export async function createOtp(
   email: string,
-  purpose: "REGISTER" | "LOGIN" | "RESET_PASSWORD"
+  purpose: "REGISTER" | "LOGIN" | "RESET_PASSWORD" | "PATIENT_REGISTER" | "PATIENT_RESET_PASSWORD"
 ) {
   const code = generateOtpCode();
   const codeHash = await bcrypt.hash(code, 10);
@@ -28,7 +28,7 @@ export async function createOtp(
 
 export async function verifyOtp(
   email: string,
-  purpose: "REGISTER" | "LOGIN" | "RESET_PASSWORD",
+  purpose: "REGISTER" | "LOGIN" | "RESET_PASSWORD" | "PATIENT_REGISTER" | "PATIENT_RESET_PASSWORD",
   code: string
 ) {
   const otp = await Otp.findOne({ email, purpose, consumedAt: null }).sort({ createdAt: -1 });

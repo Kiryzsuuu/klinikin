@@ -19,9 +19,14 @@ const NAV = [
   { href: "/admin/pharmacy", label: "Farmasi & Stok", icon: "💊" },
   { href: "/admin/cashier", label: "Kasir & Invoice", icon: "🧾" },
   { href: "/admin/bookings", label: "Booking Pasien", icon: "📅" },
+  { href: "/admin/lab", label: "Lab & Radiologi", icon: "🧪" },
+  { href: "/admin/insurance", label: "Asuransi Swasta", icon: "🛡️" },
+  { href: "/admin/procurement", label: "Procurement Obat", icon: "📦" },
   { href: "/admin/hr", label: "SDM & Jadwal", icon: "🗓️" },
+  { href: "/admin/accreditation", label: "Akreditasi", icon: "📋" },
   { href: "/admin/chat", label: "Asisten AI", icon: "✨" },
   { href: "/admin/users", label: "Manajemen User", icon: "👥" },
+  { href: "/admin/api-keys", label: "API Publik", icon: "🔑" },
   { href: "/admin/settings", label: "Site Settings", icon: "⚙️" },
 ];
 

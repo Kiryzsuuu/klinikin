@@ -6,23 +6,38 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
 ## Fitur yang sudah ada
 
 **Fondasi**
-- Autentikasi + OTP email (register, login, lupa/reset password) via Gmail SMTP
-- Manajemen User (CRUD penuh, role, foto)
+- Autentikasi + OTP email (staf & pasien) via Gmail SMTP
+- Manajemen User staf (CRUD penuh, role, foto)
 - Site Settings fully customizable (branding, tema warna, font, kontak, sosial media, maintenance mode)
 - Semua gambar disimpan sebagai base64 langsung di MongoDB (maks 2MB/gambar)
 - Palet warna `#F5F5F5 / #B9E937 / #57D131 / #406661` + font **Fredoka**
+- API publik untuk pihak ketiga (`/api/public/v1/*`, auth via API key, kelola di `/admin/api-keys`)
 
 **Operasional Klinik**
 - Manajemen Cabang (CRUD)
 - Data Pasien terpusat lintas cabang + RME (SOAP notes, diagnosis ICD-10, riwayat kunjungan)
+- Odontogram (klinik gigi) & Skin Chart (klinik kecantikan) di setiap kunjungan
 - Farmasi & Stok Obat, termasuk transfer stok antar cabang
 - Kasir & Invoice (multi item, status pembayaran)
-- SDM dasar — jadwal praktik/shift staf per cabang
-- Booking Pasien publik (`/booking`, tanpa perlu akun) — admin konfirmasi → otomatis buat pasien + kunjungan RME
+- Laboratorium & Radiologi (order, hasil teks + file)
+- Asuransi swasta — daftar provider + pelacakan status klaim manual
+- Procurement obat — supplier + purchase order, stok otomatis bertambah saat status RECEIVED
+- SDM — jadwal praktik/shift staf per cabang
+- Checklist Akreditasi per cabang dengan bukti upload
+- Booking Pasien publik (`/booking`) — admin konfirmasi → otomatis buat pasien + kunjungan RME
 
-**AI (lewat Vercel AI Gateway)**
-- ✨ Smart Diagnosis Suggestion — saran ICD-10 dari gejala (di halaman detail pasien)
+**Patient Portal (`/portal`)**
+- Pasien daftar akun sendiri (cocokkan No. RM + telepon dari data klinik) + verifikasi OTP email
+- Login terpisah dari staf (session cookie berbeda)
+- Lihat riwayat kunjungan, diagnosis, obat, dan hasil lab sendiri
+- Booking konsultasi baru langsung dari dashboard
+
+**AI (lewat Groq — `@ai-sdk/groq`)**
+- ✨ Smart Diagnosis Suggestion — saran ICD-10 dari gejala
 - ✨ Auto-Summary Rekam Medis — ringkasan riwayat pasien sebelum konsultasi
+- ✨ Voice-to-Text RME — rekam suara dokter, ditranskrip otomatis (Groq Whisper) ke kolom Subjective
+- ✨ Prediksi Stok Obat — estimasi kebutuhan 30 hari berdasarkan tren penjualan invoice
+- ✨ Revenue Forecast — analisis tren pendapatan 6 bulan di dashboard
 - ✨ Asisten AI Chat internal untuk staf (`/admin/chat`)
 
 **Konsultasi Online (Interactive Call)**
@@ -30,58 +45,71 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
   butuh akun provider pihak ketiga**, cukup browser modern + izin kamera/mikrofon. Room dibuat
   otomatis saat booking dengan tipe "Konsultasi Online" dikonfirmasi.
 
-## Yang BELUM diimplementasikan (butuh akun/kredensial pihak ketiga)
+## Yang masih perlu tindakan Anda (butuh akun/kredensial pihak ketiga)
 
-Kerangka kodenya sudah disiapkan di `lib/integrations/`, tapi tidak bisa aktif tanpa Anda
-mendaftar & mengisi kredensial sendiri di `.env.local`:
+Kerangka kodenya sudah disiapkan, tapi tidak bisa aktif tanpa Anda mendaftar & mengisi kredensial
+sendiri di `.env.local`:
 
-- **SATUSEHAT** (`lib/integrations/satusehat.ts`) — butuh client_id/secret resmi dari Kemenkes
-- **BPJS PCare** (`lib/integrations/bpjs.ts`) — butuh Cons ID/Secret Key resmi dari BPJS Kesehatan
-- **WhatsApp notifikasi** (`lib/integrations/whatsapp.ts`) — butuh token device Fonnte
+- **SATUSEHAT** (`lib/integrations/satusehat.ts`) — client_id/secret resmi dari Kemenkes
+- **BPJS PCare** (`lib/integrations/bpjs.ts`) — Cons ID/Secret Key resmi dari BPJS Kesehatan
+- **WhatsApp notifikasi** (`lib/integrations/whatsapp.ts`) — token device Fonnte
+- **Groq AI** — `GROQ_API_KEY` dari console.groq.com, plus verifikasi `GROQ_MODEL` &
+  `GROQ_TRANSCRIBE_MODEL` masih tersedia (daftar model Groq berubah cukup sering)
 
-Juga belum ada: dashboard BI lanjutan (revenue forecast AI), Prediksi Stok Obat AI, akun login
-khusus pasien (saat ini booking tanpa akun), modul Lab/Radiologi, integrasi asuransi swasta, API
-publik.
+**Catatan jujur soal "Asuransi Swasta" & "Procurement Obat":** tidak ada API generik untuk
+integrasi ke insurer atau marketplace obat pihak ketiga — masing-masing punya sistem sendiri.
+Modul ini jadi pencatatan/pelacakan status manual, bukan submit/order otomatis ke pihak eksternal.
 
 ## Setup
 
 ```bash
 npm install
 cp .env.example .env.local
-# isi MONGODB_URI, GMAIL_USER, GMAIL_APP_PASSWORD, JWT_SECRET, AI_GATEWAY_API_KEY
+# isi MONGODB_URI, GMAIL_USER, GMAIL_APP_PASSWORD, JWT_SECRET, GROQ_API_KEY
 
 npm run seed   # buat akun OWNER pertama
 npm run dev
 ```
 
-Buka http://localhost:3000 — login di `/login`, kelola semuanya di `/admin`. Landing page publik
-(`/`) dan form booking (`/booking`) tidak butuh login.
+Buka http://localhost:3000 — login staf di `/login`, kelola semuanya di `/admin`. Pasien
+mendaftar/login sendiri di `/portal`. Landing page publik (`/`) dan form booking (`/booking`)
+tidak butuh login sama sekali.
 
 ### Catatan Gmail SMTP
 Gunakan **App Password** (bukan password akun biasa): aktifkan 2-Step Verification lalu buat App
 Password di https://myaccount.google.com/apppasswords.
 
-### Catatan AI Gateway
-Ambil `AI_GATEWAY_API_KEY` di https://vercel.com/[team]/~/ai-gateway/api-keys. Saat deploy di
-Vercel, biasanya terautentikasi otomatis lewat OIDC tanpa perlu isi key manual.
+### Catatan Groq
+Ambil `GROQ_API_KEY` di https://console.groq.com/keys. Cek model chat & Whisper transcription
+yang masih didukung di https://console.groq.com/docs/models sebelum deploy — jangan asumsikan
+default di `.env.example` masih berlaku.
 
 ## Struktur
 
 ```
 app/
   page.tsx, booking/, call/[roomId]/        # halaman publik
-  login, register, verify-otp, forgot/reset-password/
-  admin/                                     # butuh login: dashboard, branches, patients,
-                                              # pharmacy, cashier, hr, bookings, chat, users, settings
+  login, register, verify-otp, forgot/reset-password/   # auth staf
+  portal/                                    # auth & dashboard pasien
+  admin/                                     # butuh login staf: dashboard, branches, patients,
+                                              # pharmacy, cashier, hr, bookings, lab, insurance,
+                                              # procurement, accreditation, chat, users, settings, api-keys
   api/
-    auth/, admin/users/, settings/           # fondasi
+    auth/, admin/users/, settings/           # fondasi staf
+    patient-auth/                            # fondasi pasien
     branches/, patients/, visits/, medicines/, invoices/, hr/shifts/, bookings/, calls/
-    ai/                                      # diagnosis-suggestion, patient-summary, chat
+    lab-orders/, insurance/, suppliers/, purchase-orders/, accreditation/, admin/api-keys/
+    public/v1/                               # API publik pihak ketiga (auth: X-API-Key)
+    ai/                                      # diagnosis-suggestion, patient-summary, chat,
+                                              # transcribe, stock-prediction, revenue-forecast
 lib/
-  db, mailer, jwt, auth, otp, response, image, guard, ai, fileToBase64
+  db, mailer, jwt, auth, patientAuth, otp, response, image, guard, ai, apiKeyAuth, fileToBase64
   integrations/                              # satusehat, bpjs, whatsapp (skeleton, butuh kredensial)
 models/                                      # User, Otp, SiteSettings, Branch, Patient, Visit,
-                                              # Medicine, StockTransfer, Invoice, Shift, Booking, CallSession
+                                              # Medicine, StockTransfer, Invoice, Shift, Booking,
+                                              # CallSession, LabOrder, Insurance*, ApiKey,
+                                              # AccreditationItem, Supplier, PurchaseOrder
+components/                                  # ui, VoiceRecorder, Odontogram, SkinChart
 scripts/seed.ts
 proxy.ts                                     # proteksi route /admin/* (Next 16 "proxy")
 ```

@@ -38,8 +38,11 @@ export default async function Home() {
           <Link href="/booking" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
             Booking Konsultasi
           </Link>
+          <Link href="/portal/login" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
+            Portal Pasien
+          </Link>
           <Link href="/login" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
-            Masuk
+            Masuk Staf
           </Link>
           {settings.features?.registrationEnabled && (
             <Link href="/register" className="px-5 py-2 bg-green text-white rounded-2xl text-sm font-medium shadow-md shadow-green/30">

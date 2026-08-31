@@ -33,7 +33,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const branch = await Branch.findById(booking.branchId);
     if (!branch) return fail("BRANCH_NOT_FOUND", "Cabang tidak ditemukan", 404);
 
-    let patient = await Patient.findOne({ phone: booking.patientPhone, name: booking.patientName });
+    let patient = booking.patientId
+      ? await Patient.findById(booking.patientId)
+      : await Patient.findOne({ phone: booking.patientPhone, name: booking.patientName });
     if (!patient) {
       patient = await Patient.create({
         medicalRecordNo: await generateMedicalRecordNo(),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Fragment, useEffect, useState, useCallback } from "react";
 import { Button, Card, Input, Label, Select, Badge } from "@/components/ui";
 
 type Branch = { _id: string; name: string };
@@ -27,6 +27,9 @@ export default function PharmacyPage() {
   const [showTransfer, setShowTransfer] = useState<MedicineRow | null>(null);
   const [transferTo, setTransferTo] = useState("");
   const [transferQty, setTransferQty] = useState(1);
+
+  const [predicting, setPredicting] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<{ id: string; text: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -97,6 +100,32 @@ export default function PharmacyPage() {
     }
   }
 
+  async function predictStock(m: MedicineRow) {
+    setPredicting(m._id);
+    setPrediction(null);
+    try {
+      const res = await fetch("/api/ai/stock-prediction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ medicineId: m._id }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        const p = json.data;
+        setPrediction({
+          id: m._id,
+          text: `Perkiraan kebutuhan 30 hari: ${p.predictedNeed30Days} ${m.unit} (terjual ${p.totalSold30Days} bulan lalu). ${
+            p.reorderRecommended ? "⚠️ Disarankan reorder sekarang." : "Stok masih aman."
+          } ${p.reasoning}`,
+        });
+      } else {
+        alert(json.error?.message);
+      }
+    } finally {
+      setPredicting(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -125,21 +154,31 @@ export default function PharmacyPage() {
                 <tr><td colSpan={5} className="py-6 text-center text-dark/40">Belum ada data obat</td></tr>
               )}
               {medicines.map((m) => (
-                <tr key={m._id} className="border-b border-dark/5 last:border-0">
-                  <td className="py-3 pr-4 font-medium text-dark">{m.name}</td>
-                  <td className="py-3 pr-4 text-dark/70">{m.branchId?.name || "-"}</td>
-                  <td className="py-3 pr-4">
-                    <Badge tone={m.stock.current <= m.stock.minimum ? "red" : "green"}>
-                      {m.stock.current} {m.unit}
-                    </Badge>
-                  </td>
-                  <td className="py-3 pr-4 text-dark/70">Rp {m.pricing.sellPrice.toLocaleString("id-ID")}</td>
-                  <td className="py-3 pr-4 text-right">
-                    <button onClick={() => setShowTransfer(m)} className="text-green font-medium hover:underline cursor-pointer">
-                      Transfer
-                    </button>
-                  </td>
-                </tr>
+                <Fragment key={m._id}>
+                  <tr className="border-b border-dark/5 last:border-0">
+                    <td className="py-3 pr-4 font-medium text-dark">{m.name}</td>
+                    <td className="py-3 pr-4 text-dark/70">{m.branchId?.name || "-"}</td>
+                    <td className="py-3 pr-4">
+                      <Badge tone={m.stock.current <= m.stock.minimum ? "red" : "green"}>
+                        {m.stock.current} {m.unit}
+                      </Badge>
+                    </td>
+                    <td className="py-3 pr-4 text-dark/70">Rp {m.pricing.sellPrice.toLocaleString("id-ID")}</td>
+                    <td className="py-3 pr-4 text-right space-x-3">
+                      <button onClick={() => predictStock(m)} disabled={predicting === m._id} className="text-dark/60 font-medium hover:text-green cursor-pointer disabled:opacity-50">
+                        {predicting === m._id ? "..." : "✨ Prediksi"}
+                      </button>
+                      <button onClick={() => setShowTransfer(m)} className="text-green font-medium hover:underline cursor-pointer">
+                        Transfer
+                      </button>
+                    </td>
+                  </tr>
+                  {prediction?.id === m._id && (
+                    <tr className="bg-lime/10">
+                      <td colSpan={5} className="px-4 py-2 text-xs text-dark/80">{prediction.text}</td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>

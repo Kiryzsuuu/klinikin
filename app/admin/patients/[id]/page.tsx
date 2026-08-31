@@ -2,6 +2,9 @@
 
 import { useEffect, useState, useCallback, use } from "react";
 import { Button, Card, Label, Select, Badge } from "@/components/ui";
+import VoiceRecorder from "@/components/VoiceRecorder";
+import Odontogram from "@/components/Odontogram";
+import SkinChart from "@/components/SkinChart";
 
 type Patient = { _id: string; name: string; medicalRecordNo: string; allergies?: string[]; phone?: string };
 type Visit = {
@@ -14,6 +17,8 @@ type Visit = {
   branchId?: { name: string };
   assessment?: { diagnoses?: { icdCode: string; icdDescription: string }[] };
   aiSummary?: string;
+  dentalChart?: { toothNumber: number; status: string; note?: string }[];
+  skinChart?: { area: string; condition: string; photoBase64?: string }[];
 };
 type Branch = { _id: string; name: string; code: string };
 type Doctor = { _id: string; name: string; role: string };
@@ -37,6 +42,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
   const [subjective, setSubjective] = useState("");
   const [suggestions, setSuggestions] = useState<DiagnosisSuggestion[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const [openChart, setOpenChart] = useState<{ visitId: string; type: "dental" | "skin" } | null>(null);
   const [activeVisit, setActiveVisit] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -136,6 +142,26 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
     load();
   }
 
+  async function saveDentalChart(visitId: string, chart: { toothNumber: number; status: string }[]) {
+    await fetch(`/api/visits/${visitId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dentalChart: chart }),
+    });
+    setOpenChart(null);
+    load();
+  }
+
+  async function saveSkinChart(visitId: string, entries: { area: string; condition: string; photoBase64?: string }[]) {
+    await fetch(`/api/visits/${visitId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ skinChart: entries }),
+    });
+    setOpenChart(null);
+    load();
+  }
+
   if (loading || !patient) return <p className="text-dark/50">Memuat...</p>;
 
   return (
@@ -185,17 +211,51 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
             {v.status !== "DONE" && (
               <div className="border-t border-dark/10 pt-3 space-y-3">
                 <div>
-                  <Label>Keluhan / Subjective (SOAP)</Label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="!mb-0">Keluhan / Subjective (SOAP)</Label>
+                    <VoiceRecorder onTranscript={(text) => setSubjective((prev) => (prev ? `${prev} ${text}` : text))} />
+                  </div>
                   <textarea
                     className="w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
                     rows={2}
-                    placeholder="Contoh: demam 2 hari, batuk berdahak, nyeri tenggorokan"
+                    placeholder="Contoh: demam 2 hari, batuk berdahak, nyeri tenggorokan (atau gunakan tombol rekam suara)"
+                    value={subjective}
                     onChange={(e) => setSubjective(e.target.value)}
                   />
                 </div>
-                <Button type="button" variant="secondary" onClick={() => getSuggestions(v._id)} disabled={aiLoading}>
-                  {aiLoading && activeVisit === v._id ? "Menganalisis..." : "✨ AI Saran Diagnosis ICD-10"}
-                </Button>
+
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="secondary" onClick={() => getSuggestions(v._id)} disabled={aiLoading}>
+                    {aiLoading && activeVisit === v._id ? "Menganalisis..." : "✨ AI Saran Diagnosis ICD-10"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setOpenChart(openChart?.visitId === v._id && openChart.type === "dental" ? null : { visitId: v._id, type: "dental" })}
+                    className="!px-3 !py-1.5 text-xs"
+                  >
+                    🦷 Odontogram
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setOpenChart(openChart?.visitId === v._id && openChart.type === "skin" ? null : { visitId: v._id, type: "skin" })}
+                    className="!px-3 !py-1.5 text-xs"
+                  >
+                    ✨ Skin Chart
+                  </Button>
+                </div>
+
+                {openChart?.visitId === v._id && openChart.type === "dental" && (
+                  <div className="bg-bg rounded-2xl p-4">
+                    <Odontogram initial={v.dentalChart || []} onSave={(chart) => saveDentalChart(v._id, chart)} />
+                  </div>
+                )}
+                {openChart?.visitId === v._id && openChart.type === "skin" && (
+                  <div className="bg-bg rounded-2xl p-4">
+                    <SkinChart initial={v.skinChart || []} onSave={(entries) => saveSkinChart(v._id, entries)} />
+                  </div>
+                )}
 
                 {activeVisit === v._id && suggestions.length > 0 && (
                   <div className="space-y-2 bg-bg rounded-2xl p-4">

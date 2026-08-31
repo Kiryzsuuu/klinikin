@@ -6,6 +6,7 @@ const bookingSchema = new Schema(
   {
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     doctorId: { type: Schema.Types.ObjectId, ref: "User" },
+    patientId: { type: Schema.Types.ObjectId, ref: "Patient" }, // terisi jika dibuat dari Patient Portal (sudah login)
     patientName: { type: String, required: true },
     patientPhone: { type: String, required: true },
     patientEmail: { type: String, default: "" },

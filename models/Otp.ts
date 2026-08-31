@@ -6,7 +6,7 @@ const otpSchema = new Schema(
     codeHash: { type: String, required: true },
     purpose: {
       type: String,
-      enum: ["REGISTER", "LOGIN", "RESET_PASSWORD"],
+      enum: ["REGISTER", "LOGIN", "RESET_PASSWORD", "PATIENT_REGISTER", "PATIENT_RESET_PASSWORD"],
       required: true,
     },
     expiresAt: { type: Date, required: true },

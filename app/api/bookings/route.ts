@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/db";
 import { Booking } from "@/models/Booking";
 import { sendMail } from "@/lib/mailer";
 import { getSession } from "@/lib/auth";
+import { getPatientSession } from "@/lib/patientAuth";
 import { ok, fail } from "@/lib/response";
 
 const createSchema = z.object({
@@ -27,8 +28,13 @@ export async function POST(req: NextRequest) {
 
   const data = parsed.data;
   const callRoomId = data.consultationType === "ONLINE" ? crypto.randomUUID() : "";
+  const patientSession = await getPatientSession();
 
-  const booking = await Booking.create({ ...data, callRoomId });
+  const booking = await Booking.create({
+    ...data,
+    callRoomId,
+    patientId: patientSession?.patientId,
+  });
 
   if (data.patientEmail) {
     try {
