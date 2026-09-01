@@ -40,3 +40,10 @@ body {
   background: var(--color-green);
   border-radius: 8px;
 }
+
+@media print {
+  aside,
+  header.lg\:hidden {
+    display: none !important;
+  }
+}

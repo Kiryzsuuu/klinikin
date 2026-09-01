@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { Visit } from "@/models/Visit";
 import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
+import { audit } from "@/lib/audit";
 
 const updateSchema = z.object({
   status: z.enum(["WAITING", "IN_PROGRESS", "DONE", "CANCELLED"]).optional(),
@@ -42,5 +43,6 @@ export async function PUT(req: NextRequest, { params }: Params) {
   await connectDB();
   const visit = await Visit.findByIdAndUpdate(id, parsed.data, { new: true });
   if (!visit) return fail("VISIT_NOT_FOUND", "Kunjungan tidak ditemukan", 404);
+  await audit(g.session, "VISIT_UPDATE", "Visit", id, req, { fields: Object.keys(parsed.data) });
   return ok(visit);
 }

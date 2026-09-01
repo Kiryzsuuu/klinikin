@@ -6,6 +6,7 @@ import { User, ROLES } from "@/models/User";
 import { getSession } from "@/lib/auth";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
+import { audit } from "@/lib/audit";
 
 const MANAGE_ROLES = ["OWNER", "ADMIN_PUSAT"];
 
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
 
   const [items, total] = await Promise.all([
     User.find(filter)
-      .select("-passwordHash")
+      .select("-passwordHash -mfaSecret -mfaPendingSecret")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit),
@@ -80,5 +81,8 @@ export async function POST(req: NextRequest) {
 
   const result = user.toObject();
   delete result.passwordHash;
+  delete result.mfaSecret;
+  delete result.mfaPendingSecret;
+  await audit(session, "USER_CREATE", "User", String(user._id), req, { role });
   return ok(result, { status: 201 });
 }

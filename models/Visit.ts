@@ -20,6 +20,8 @@ const visitSchema = new Schema(
       weight: { type: Number },
       height: { type: Number },
       physicalExam: { type: String, default: "" },
+      // Foto/dokumen medis (hasil scan, foto luka, dsb) — base64 langsung di dokumen
+      attachments: [{ type: String }],
     },
     assessment: {
       diagnoses: [
@@ -42,6 +44,12 @@ const visitSchema = new Schema(
       ],
       controlDate: { type: Date },
       doctorNotes: { type: String, default: "" },
+      // e-Rujukan
+      referral: {
+        isReferred: { type: Boolean, default: false },
+        referralTo: { type: String, default: "" },
+        reason: { type: String, default: "" },
+      },
     },
 
     aiSummary: { type: String, default: "" },

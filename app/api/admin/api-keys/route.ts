@@ -5,6 +5,7 @@ import { ApiKey } from "@/models/ApiKey";
 import { generateApiKey } from "@/lib/apiKeyAuth";
 import { guard, isError, MANAGE_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
+import { audit } from "@/lib/audit";
 
 const createSchema = z.object({
   name: z.string().min(2),
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
   const { raw, keyHash, keyPrefix } = generateApiKey();
 
   await connectDB();
-  await ApiKey.create({
+  const created = await ApiKey.create({
     name: parsed.data.name,
     scopes: parsed.data.scopes,
     keyHash,
@@ -39,5 +40,6 @@ export async function POST(req: NextRequest) {
     createdBy: g.session.userId,
   });
 
+  await audit(g.session, "API_KEY_CREATE", "ApiKey", String(created._id), req, { scopes: parsed.data.scopes });
   return ok({ apiKey: raw, message: "Simpan key ini sekarang — tidak akan ditampilkan lagi." }, { status: 201 });
 }

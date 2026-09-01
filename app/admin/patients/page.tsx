@@ -85,7 +85,12 @@ export default function PatientsPage() {
           <h1 className="text-2xl font-semibold text-dark">Data Pasien</h1>
           <p className="text-dark/60">Pasien terpusat lintas cabang.</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>+ Pasien Baru</Button>
+        <div className="flex gap-2">
+          <a href="/api/export/patients" className="px-4 py-2.5 rounded-2xl border border-dark/15 text-dark/70 hover:bg-dark/5 text-sm font-medium">
+            Export CSV
+          </a>
+          <Button onClick={() => setShowForm(true)}>+ Pasien Baru</Button>
+        </div>
       </div>
 
       <Card>

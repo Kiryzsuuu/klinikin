@@ -11,6 +11,9 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [mfaToken, setMfaToken] = useState("");
+  const [mfaCode, setMfaCode] = useState("");
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -30,10 +33,60 @@ export default function LoginPage() {
         setError(json.error?.message || "Terjadi kesalahan");
         return;
       }
+      if (json.data.mfaRequired) {
+        setMfaToken(json.data.mfaToken);
+        return;
+      }
       router.push("/admin");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onVerifyMfa(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/mfa/verify-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mfaToken, code: mfaCode }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        setError(json.error?.message || "Kode MFA salah");
+        return;
+      }
+      router.push("/admin");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (mfaToken) {
+    return (
+      <main className="flex-1 flex items-center justify-center p-6">
+        <Card className="w-full max-w-md">
+          <h1 className="text-2xl font-semibold text-dark mb-1">Verifikasi MFA</h1>
+          <p className="text-dark/60 mb-6 text-sm">Masukkan kode 6 digit dari aplikasi authenticator Anda.</p>
+          <form onSubmit={onVerifyMfa} className="space-y-4">
+            <Input
+              required
+              inputMode="numeric"
+              maxLength={6}
+              value={mfaCode}
+              onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
+              className="text-center text-2xl tracking-[0.5em] font-semibold"
+            />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Memverifikasi..." : "Verifikasi"}
+            </Button>
+          </form>
+        </Card>
+      </main>
+    );
   }
 
   return (

@@ -40,6 +40,22 @@ export default async function AdminDashboard() {
 
   const revenueThisMonth = revenueAgg[0]?.total || 0;
 
+  // KPI dokter: jumlah kunjungan & kunjungan selesai bulan ini
+  const kpiByDoctor = await Visit.aggregate([
+    { $match: { visitDate: { $gte: startOfMonth } } },
+    {
+      $group: {
+        _id: "$doctorId",
+        totalVisits: { $sum: 1 },
+        done: { $sum: { $cond: [{ $eq: ["$status", "DONE"] }, 1, 0] } },
+      },
+    },
+    { $lookup: { from: "users", localField: "_id", foreignField: "_id", as: "doctor" } },
+    { $unwind: "$doctor" },
+    { $sort: { totalVisits: -1 } },
+    { $limit: 10 },
+  ]);
+
   const stats = [
     { label: "Total Cabang", value: totalBranches, tone: "bg-green" },
     { label: "Total Pasien", value: totalPatients, tone: "bg-lime" },
@@ -100,6 +116,19 @@ export default async function AdminDashboard() {
           </div>
         </Card>
       </div>
+
+      <Card>
+        <h2 className="font-semibold text-dark mb-4">KPI Dokter — Kunjungan Bulan Ini</h2>
+        <div className="space-y-2">
+          {kpiByDoctor.length === 0 && <p className="text-dark/40 text-sm">Belum ada data kunjungan bulan ini</p>}
+          {kpiByDoctor.map((k: { _id: string; totalVisits: number; done: number; doctor: { name: string } }) => (
+            <div key={k._id} className="flex items-center justify-between py-1.5 border-b border-dark/5 last:border-0">
+              <span className="text-sm text-dark">{k.doctor.name}</span>
+              <span className="text-sm text-dark/60">{k.done}/{k.totalVisits} selesai</span>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 }

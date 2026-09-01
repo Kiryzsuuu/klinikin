@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState, useCallback, use } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { Button, Card, Label, Select, Badge } from "@/components/ui";
 import VoiceRecorder from "@/components/VoiceRecorder";
 import Odontogram from "@/components/Odontogram";
 import SkinChart from "@/components/SkinChart";
+import PrescriptionEditor from "@/components/PrescriptionEditor";
+import { fileToBase64 } from "@/lib/fileToBase64";
 
 type Patient = { _id: string; name: string; medicalRecordNo: string; allergies?: string[]; phone?: string };
 type Visit = {
@@ -16,6 +20,11 @@ type Visit = {
   doctorId?: { name: string };
   branchId?: { name: string };
   assessment?: { diagnoses?: { icdCode: string; icdDescription: string }[] };
+  objective?: { attachments?: string[] };
+  plan?: {
+    medications?: { medicineName: string; dosage: string; frequency: string; duration: string }[];
+    referral?: { isReferred: boolean; referralTo: string; reason: string };
+  };
   aiSummary?: string;
   dentalChart?: { toothNumber: number; status: string; note?: string }[];
   skinChart?: { area: string; condition: string; photoBase64?: string }[];
@@ -43,6 +52,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
   const [suggestions, setSuggestions] = useState<DiagnosisSuggestion[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [openChart, setOpenChart] = useState<{ visitId: string; type: "dental" | "skin" } | null>(null);
+  const [openRx, setOpenRx] = useState<string | null>(null);
   const [activeVisit, setActiveVisit] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -162,6 +172,35 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
     load();
   }
 
+  async function savePrescription(
+    visitId: string,
+    medications: { medicineName: string; dosage: string; frequency: string; duration: string }[],
+    referral: { isReferred: boolean; referralTo: string; reason: string }
+  ) {
+    await fetch(`/api/visits/${visitId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan: { medications, referral } }),
+    });
+    load();
+  }
+
+  async function addAttachment(visit: Visit, file: File | undefined) {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Ukuran file maksimal 2MB");
+      return;
+    }
+    const base64 = await fileToBase64(file);
+    const attachments = [...(visit.objective?.attachments || []), base64];
+    await fetch(`/api/visits/${visit._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ objective: { attachments } }),
+    });
+    load();
+  }
+
   if (loading || !patient) return <p className="text-dark/50">Memuat...</p>;
 
   return (
@@ -208,6 +247,24 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
               </div>
             )}
 
+            {v.objective?.attachments && v.objective.attachments.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {v.objective.attachments.map((a, i) => (
+                  <a key={i} href={a} target="_blank" rel="noreferrer">
+                    <Image src={a} alt={`Lampiran ${i + 1}`} width={56} height={56} unoptimized className="rounded-lg object-cover w-14 h-14 border border-dark/10" />
+                  </a>
+                ))}
+              </div>
+            )}
+
+            <Link
+              href={`/admin/patients/${id}/visits/${v._id}/print`}
+              target="_blank"
+              className="inline-block px-3 py-1.5 text-xs rounded-2xl border border-dark/20 text-dark/70 hover:bg-dark/5 mb-2"
+            >
+              🖨️ Cetak Resep/Rujukan
+            </Link>
+
             {v.status !== "DONE" && (
               <div className="border-t border-dark/10 pt-3 space-y-3">
                 <div>
@@ -244,6 +301,18 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                   >
                     ✨ Skin Chart
                   </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setOpenRx(openRx === v._id ? null : v._id)}
+                    className="!px-3 !py-1.5 text-xs"
+                  >
+                    ℞ Resep & Rujukan
+                  </Button>
+                  <label className="px-3 py-1.5 text-xs rounded-2xl border border-dark/20 text-dark/70 hover:bg-dark/5 cursor-pointer">
+                    📎 Lampirkan Foto/Dokumen
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => addAttachment(v, e.target.files?.[0])} />
+                  </label>
                 </div>
 
                 {openChart?.visitId === v._id && openChart.type === "dental" && (
@@ -254,6 +323,15 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                 {openChart?.visitId === v._id && openChart.type === "skin" && (
                   <div className="bg-bg rounded-2xl p-4">
                     <SkinChart initial={v.skinChart || []} onSave={(entries) => saveSkinChart(v._id, entries)} />
+                  </div>
+                )}
+                {openRx === v._id && (
+                  <div className="bg-bg rounded-2xl p-4">
+                    <PrescriptionEditor
+                      initialMeds={v.plan?.medications || []}
+                      initialReferral={v.plan?.referral}
+                      onSave={(meds, referral) => savePrescription(v._id, meds, referral)}
+                    />
                   </div>
                 )}
 

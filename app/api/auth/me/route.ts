@@ -8,7 +8,7 @@ export async function GET() {
   if (!session) return fail("UNAUTHORIZED", "Belum login", 401);
 
   await connectDB();
-  const user = await User.findById(session.userId).select("-passwordHash");
+  const user = await User.findById(session.userId).select("-passwordHash -mfaSecret -mfaPendingSecret");
   if (!user) return fail("USER_NOT_FOUND", "Pengguna tidak ditemukan", 404);
 
   return ok({ user });

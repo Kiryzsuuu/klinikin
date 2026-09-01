@@ -5,6 +5,7 @@ import { getOrCreateSettings, SiteSettings } from "@/models/SiteSettings";
 import { getSession } from "@/lib/auth";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
+import { audit } from "@/lib/audit";
 
 const MANAGE_ROLES = ["OWNER", "ADMIN_PUSAT"];
 
@@ -90,6 +91,7 @@ export async function PUT(req: NextRequest) {
     { new: true }
   );
 
+  await audit(session, "SETTINGS_UPDATE", "SiteSettings", "SITE_SETTINGS", req, { fields: Object.keys(data) });
   return ok(settings);
 }
 

@@ -6,13 +6,14 @@ import { Visit } from "@/models/Visit";
 import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
+import { audit } from "@/lib/audit";
 
 const updateSchema = z.object({}).passthrough();
 
 type Params = { params: Promise<{ id: string }> };
 
 // Detail pasien + riwayat kunjungan lintas cabang (inti RME)
-export async function GET(_req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: Params) {
   const g = await guard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
 
@@ -27,6 +28,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   ]);
   if (!patient) return fail("PATIENT_NOT_FOUND", "Pasien tidak ditemukan", 404);
 
+  await audit(g.session, "PATIENT_VIEW", "Patient", id, req);
   return ok({ patient, visits });
 }
 
@@ -46,10 +48,11 @@ export async function PUT(req: NextRequest, { params }: Params) {
   await connectDB();
   const patient = await Patient.findByIdAndUpdate(id, data, { new: true });
   if (!patient) return fail("PATIENT_NOT_FOUND", "Pasien tidak ditemukan", 404);
+  await audit(g.session, "PATIENT_UPDATE", "Patient", id, req, { fields: Object.keys(data) });
   return ok(patient);
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(req: NextRequest, { params }: Params) {
   const g = await guard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
 
@@ -57,5 +60,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   await connectDB();
   const patient = await Patient.findByIdAndUpdate(id, { isActive: false }, { new: true });
   if (!patient) return fail("PATIENT_NOT_FOUND", "Pasien tidak ditemukan", 404);
+  await audit(g.session, "PATIENT_DEACTIVATE", "Patient", id, req);
   return ok({ message: "Pasien dinonaktifkan" });
 }

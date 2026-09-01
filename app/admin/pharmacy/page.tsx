@@ -4,6 +4,7 @@ import { Fragment, useEffect, useState, useCallback } from "react";
 import { Button, Card, Input, Label, Select, Badge } from "@/components/ui";
 
 type Branch = { _id: string; name: string };
+type Batch = { batchNo: string; expiredDate: string; quantity: number };
 type MedicineRow = {
   _id: string;
   name: string;
@@ -11,9 +12,21 @@ type MedicineRow = {
   stock: { current: number; minimum: number };
   pricing: { sellPrice: number };
   branchId?: { _id: string; name: string };
+  batches?: Batch[];
 };
 
 const emptyForm = { branchId: "", name: "", unit: "tablet", current: 0, minimum: 10, sellPrice: 0, buyPrice: 0 };
+const emptyBatch = { batchNo: "", expiredDate: "", quantity: 1 };
+
+function nearestExpiry(batches?: Batch[]) {
+  if (!batches || batches.length === 0) return null;
+  const sorted = [...batches].sort((a, b) => new Date(a.expiredDate).getTime() - new Date(b.expiredDate).getTime());
+  return sorted[0];
+}
+
+function daysUntil(dateStr: string) {
+  return Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+}
 
 export default function PharmacyPage() {
   const [medicines, setMedicines] = useState<MedicineRow[]>([]);
@@ -30,6 +43,10 @@ export default function PharmacyPage() {
 
   const [predicting, setPredicting] = useState<string | null>(null);
   const [prediction, setPrediction] = useState<{ id: string; text: string } | null>(null);
+
+  const [showBatch, setShowBatch] = useState<MedicineRow | null>(null);
+  const [batchForm, setBatchForm] = useState(emptyBatch);
+  const [batchError, setBatchError] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -100,6 +117,25 @@ export default function PharmacyPage() {
     }
   }
 
+  async function addBatch(e: React.FormEvent) {
+    e.preventDefault();
+    if (!showBatch) return;
+    setBatchError("");
+    const res = await fetch(`/api/medicines/${showBatch._id}/batches`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...batchForm, quantity: Number(batchForm.quantity) }),
+    });
+    const json = await res.json();
+    if (!json.success) {
+      setBatchError(json.error?.message || "Gagal menambah batch");
+      return;
+    }
+    setShowBatch(null);
+    setBatchForm(emptyBatch);
+    load();
+  }
+
   async function predictStock(m: MedicineRow) {
     setPredicting(m._id);
     setPrediction(null);
@@ -144,16 +180,20 @@ export default function PharmacyPage() {
                 <th className="py-2 pr-4">Nama Obat</th>
                 <th className="py-2 pr-4">Cabang</th>
                 <th className="py-2 pr-4">Stok</th>
+                <th className="py-2 pr-4">Kadaluarsa Terdekat</th>
                 <th className="py-2 pr-4">Harga Jual</th>
                 <th className="py-2 pr-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody>
-              {loading && <tr><td colSpan={5} className="py-6 text-center text-dark/40">Memuat...</td></tr>}
+              {loading && <tr><td colSpan={6} className="py-6 text-center text-dark/40">Memuat...</td></tr>}
               {!loading && medicines.length === 0 && (
-                <tr><td colSpan={5} className="py-6 text-center text-dark/40">Belum ada data obat</td></tr>
+                <tr><td colSpan={6} className="py-6 text-center text-dark/40">Belum ada data obat</td></tr>
               )}
-              {medicines.map((m) => (
+              {medicines.map((m) => {
+                const expiry = nearestExpiry(m.batches);
+                const expiryDays = expiry ? daysUntil(expiry.expiredDate) : null;
+                return (
                 <Fragment key={m._id}>
                   <tr className="border-b border-dark/5 last:border-0">
                     <td className="py-3 pr-4 font-medium text-dark">{m.name}</td>
@@ -163,10 +203,23 @@ export default function PharmacyPage() {
                         {m.stock.current} {m.unit}
                       </Badge>
                     </td>
+                    <td className="py-3 pr-4">
+                      {expiry ? (
+                        <Badge tone={expiryDays !== null && expiryDays <= 30 ? "red" : "gray"}>
+                          {new Date(expiry.expiredDate).toLocaleDateString("id-ID")}
+                          {expiryDays !== null && expiryDays <= 30 && ` (${expiryDays}h lagi)`}
+                        </Badge>
+                      ) : (
+                        <span className="text-dark/30 text-xs">-</span>
+                      )}
+                    </td>
                     <td className="py-3 pr-4 text-dark/70">Rp {m.pricing.sellPrice.toLocaleString("id-ID")}</td>
                     <td className="py-3 pr-4 text-right space-x-3">
                       <button onClick={() => predictStock(m)} disabled={predicting === m._id} className="text-dark/60 font-medium hover:text-green cursor-pointer disabled:opacity-50">
                         {predicting === m._id ? "..." : "✨ Prediksi"}
+                      </button>
+                      <button onClick={() => setShowBatch(m)} className="text-dark/60 font-medium hover:text-green cursor-pointer">
+                        + Batch
                       </button>
                       <button onClick={() => setShowTransfer(m)} className="text-green font-medium hover:underline cursor-pointer">
                         Transfer
@@ -175,11 +228,12 @@ export default function PharmacyPage() {
                   </tr>
                   {prediction?.id === m._id && (
                     <tr className="bg-lime/10">
-                      <td colSpan={5} className="px-4 py-2 text-xs text-dark/80">{prediction.text}</td>
+                      <td colSpan={6} className="px-4 py-2 text-xs text-dark/80">{prediction.text}</td>
                     </tr>
                   )}
                 </Fragment>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -257,6 +311,34 @@ export default function PharmacyPage() {
               <div className="flex gap-3 pt-2">
                 <Button type="submit" className="flex-1">Transfer</Button>
                 <Button type="button" variant="ghost" onClick={() => setShowTransfer(null)}>Batal</Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
+
+      {showBatch && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
+            <h2 className="text-xl font-semibold text-dark mb-1">Tambah Batch</h2>
+            <p className="text-dark/60 text-sm mb-4">{showBatch.name}</p>
+            <form onSubmit={addBatch} className="space-y-4">
+              <div>
+                <Label>No. Batch</Label>
+                <Input required value={batchForm.batchNo} onChange={(e) => setBatchForm({ ...batchForm, batchNo: e.target.value })} />
+              </div>
+              <div>
+                <Label>Tanggal Kadaluarsa</Label>
+                <Input type="date" required value={batchForm.expiredDate} onChange={(e) => setBatchForm({ ...batchForm, expiredDate: e.target.value })} />
+              </div>
+              <div>
+                <Label>Jumlah</Label>
+                <Input type="number" min={1} required value={batchForm.quantity} onChange={(e) => setBatchForm({ ...batchForm, quantity: Number(e.target.value) })} />
+              </div>
+              {batchError && <p className="text-red-500 text-sm">{batchError}</p>}
+              <div className="flex gap-3 pt-2">
+                <Button type="submit" className="flex-1">Simpan (otomatis nambah stok)</Button>
+                <Button type="button" variant="ghost" onClick={() => setShowBatch(null)}>Batal</Button>
               </div>
             </form>
           </Card>

@@ -5,6 +5,7 @@ import { Invoice, generateInvoiceNo } from "@/models/Invoice";
 import { Branch } from "@/models/Branch";
 import { guard, isError, CASHIER_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
+import { audit } from "@/lib/audit";
 
 const itemSchema = z.object({
   type: z.enum(["CONSULTATION", "MEDICINE", "PROCEDURE", "LAB", "OTHER"]),
@@ -81,5 +82,6 @@ export async function POST(req: NextRequest) {
     cashierId: g.session.userId,
   });
 
+  await audit(g.session, "INVOICE_CREATE", "Invoice", String(invoice._id), req, { total });
   return ok(invoice, { status: 201 });
 }

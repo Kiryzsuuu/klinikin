@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
-import { signSession } from "@/lib/jwt";
+import { signSession, signMfaPendingToken } from "@/lib/jwt";
 import { ok, fail } from "@/lib/response";
 import { SESSION_COOKIE } from "@/lib/auth";
 
@@ -26,6 +26,11 @@ export async function POST(req: NextRequest) {
 
   const validPassword = await bcrypt.compare(password, user.passwordHash);
   if (!validPassword) return fail("INVALID_CREDENTIALS", "Email atau password salah", 401);
+
+  if (user.mfaEnabled) {
+    const mfaToken = signMfaPendingToken(user._id.toString());
+    return ok({ mfaRequired: true, mfaToken });
+  }
 
   user.lastLogin = new Date();
   await user.save();

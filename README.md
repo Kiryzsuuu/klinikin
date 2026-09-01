@@ -45,6 +45,27 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
   butuh akun provider pihak ketiga**, cukup browser modern + izin kamera/mikrofon. Room dibuat
   otomatis saat booking dengan tipe "Konsultasi Online" dikonfirmasi.
 
+**Keamanan & Compliance**
+- Audit Log (`/admin/audit-log`) — mencatat setiap akses & perubahan data pasien/kunjungan/user/
+  settings/API key (NFR wajib di PRD)
+- MFA/TOTP (`/admin/security`) — opsional per akun, sangat disarankan untuk OWNER & ADMIN_PUSAT;
+  begitu diaktifkan, login akan minta kode dari Google Authenticator/Authy setelah password benar
+
+**RME Lanjutan**
+- e-Resep & e-Rujukan bisa diisi per kunjungan dan dicetak (halaman print-friendly, tombol "Cetak")
+- Lampiran foto/dokumen medis per kunjungan (base64, maks 2MB/file)
+- KPI dokter (jumlah & penyelesaian kunjungan bulanan) di dashboard
+- Tracking batch & tanggal kadaluarsa obat di Farmasi, dengan badge peringatan ≤30 hari
+
+**Laporan**
+- Export CSV (buka di Excel) untuk Data Pasien dan Kasir/Invoice
+
+**Background Jobs (Vercel Cron)**
+- `vercel.json` menjadwalkan `/api/cron/stock-alert` (harian) dan `/api/cron/daily-report`
+  (harian) — mengirim email ringkasan ke OWNER/ADMIN_PUSAT. Endpoint dilindungi `CRON_SECRET`;
+  di luar Vercel, jadwalkan sendiri lewat cron/task scheduler yang memanggil endpoint tersebut
+  dengan header `Authorization: Bearer <CRON_SECRET>`.
+
 ## Yang masih perlu tindakan Anda (butuh akun/kredensial pihak ketiga)
 
 Kerangka kodenya sudah disiapkan, tapi tidak bisa aktif tanpa Anda mendaftar & mengisi kredensial
@@ -59,6 +80,13 @@ sendiri di `.env.local`:
 **Catatan jujur soal "Asuransi Swasta" & "Procurement Obat":** tidak ada API generik untuk
 integrasi ke insurer atau marketplace obat pihak ketiga — masing-masing punya sistem sendiri.
 Modul ini jadi pencatatan/pelacakan status manual, bukan submit/order otomatis ke pihak eksternal.
+
+## Yang masih belum dikerjakan (di luar cakupan software murni)
+
+- **Absensi fingerprint/face recognition** & **slip gaji/insentif otomatis** — butuh integrasi
+  perangkat keras fisik yang tidak bisa disediakan lewat kode saja
+- **Integrasi alat medis** (lab analyzer, ECG) — butuh driver/protokol alat fisik tertentu
+- **Aplikasi mobile pasien (React Native)** — di luar cakupan, saat ini hanya web portal
 
 ## Setup
 

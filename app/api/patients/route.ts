@@ -5,6 +5,7 @@ import { Patient, generateMedicalRecordNo } from "@/models/Patient";
 import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
+import { audit } from "@/lib/audit";
 
 const createSchema = z.object({
   registeredBranchId: z.string(),
@@ -61,5 +62,6 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const medicalRecordNo = await generateMedicalRecordNo();
   const patient = await Patient.create({ ...parsed.data, medicalRecordNo });
+  await audit(g.session, "PATIENT_CREATE", "Patient", String(patient._id), req);
   return ok(patient, { status: 201 });
 }

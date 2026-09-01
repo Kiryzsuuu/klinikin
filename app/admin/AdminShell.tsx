@@ -27,6 +27,8 @@ const NAV = [
   { href: "/admin/chat", label: "Asisten AI", icon: "✨" },
   { href: "/admin/users", label: "Manajemen User", icon: "👥" },
   { href: "/admin/api-keys", label: "API Publik", icon: "🔑" },
+  { href: "/admin/audit-log", label: "Audit Log", icon: "📜" },
+  { href: "/admin/security", label: "Keamanan (MFA)", icon: "🔐" },
   { href: "/admin/settings", label: "Site Settings", icon: "⚙️" },
 ];
 
