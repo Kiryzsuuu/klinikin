@@ -11,27 +11,35 @@ type Detail = {
     slug: string;
     ownerEmail: string;
     isActive: boolean;
-    subscription?: { status: string; currentPeriodEnd?: string; trialEndsAt?: string };
+    subscription?: { status: string; planId?: string | null; currentPeriodEnd?: string; trialEndsAt?: string };
   };
   users: { _id: string; name: string; email: string; role: string }[];
   branches: { _id: string; name: string; code: string }[];
   payments: { _id: string; orderId: string; amount: number; status: string; createdAt: string }[];
 };
 
+type Plan = { _id: string; name: string; isActive: boolean };
+
 const STATUSES = ["TRIAL", "ACTIVE", "PAST_DUE", "EXPIRED", "SUSPENDED"];
 
 export default function ClinicDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [data, setData] = useState<Detail | null>(null);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/superadmin/clinics/${id}`);
-      const json = await res.json();
-      if (json.success) setData(json.data);
+      const [detailRes, plansRes] = await Promise.all([
+        fetch(`/api/superadmin/clinics/${id}`),
+        fetch("/api/superadmin/plans"),
+      ]);
+      const detailJson = await detailRes.json();
+      const plansJson = await plansRes.json();
+      if (detailJson.success) setData(detailJson.data);
+      if (plansJson.success) setPlans(plansJson.data);
     } finally {
       setLoading(false);
     }
@@ -42,13 +50,13 @@ export default function ClinicDetailPage({ params }: { params: Promise<{ id: str
     load();
   }, [load]);
 
-  async function updateStatus(status: string) {
+  async function updateClinic(patch: { status?: string; planId?: string | null }) {
     setSaving(true);
     try {
       const res = await fetch(`/api/superadmin/clinics/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(patch),
       });
       const json = await res.json();
       if (json.success) load();
@@ -81,7 +89,7 @@ export default function ClinicDetailPage({ params }: { params: Promise<{ id: str
             <Select
               disabled={saving}
               value={clinic.subscription?.status || "TRIAL"}
-              onChange={(e) => updateStatus(e.target.value)}
+              onChange={(e) => updateClinic({ status: e.target.value })}
               className="w-48"
             >
               {STATUSES.map((s) => (
@@ -90,10 +98,28 @@ export default function ClinicDetailPage({ params }: { params: Promise<{ id: str
             </Select>
           </div>
           <div>
+            <p className="text-sm text-dark/60 mb-1">Paket Langganan</p>
+            <Select
+              disabled={saving}
+              value={clinic.subscription?.planId || ""}
+              onChange={(e) => updateClinic({ planId: e.target.value || null })}
+              className="w-48"
+            >
+              <option value="">Belum ada paket</option>
+              {plans.map((p) => (
+                <option key={p._id} value={p._id}>{p.name}</option>
+              ))}
+            </Select>
+          </div>
+          <div>
             <p className="text-sm text-dark/60 mb-1">Akun Klinik</p>
             <Badge tone={clinic.isActive ? "green" : "gray"}>{clinic.isActive ? "Aktif" : "Nonaktif"}</Badge>
           </div>
         </div>
+        <p className="text-xs text-dark/40 mt-3">
+          Status &amp; paket otomatis mengikuti pembayaran Midtrans yang berhasil, tapi bisa juga diubah manual
+          di sini kapan saja oleh super admin.
+        </p>
       </Card>
 
       <div className="grid lg:grid-cols-2 gap-6">

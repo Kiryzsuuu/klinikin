@@ -2,22 +2,17 @@ import { guard, isError } from "@/lib/guard";
 import { fail } from "@/lib/response";
 import { connectDB } from "@/lib/db";
 import { Clinic } from "@/models/Clinic";
+import { SubscriptionPlan } from "@/models/SubscriptionPlan";
+import { FEATURE_KEY_VALUES } from "@/lib/features";
 import type { SessionPayload } from "@/lib/jwt";
 
 export { isError };
 
-// Batasan fitur selama masa TRIAL — dibuka penuh setelah klinik berlangganan (status ACTIVE).
+// Batasan fitur selama masa TRIAL — semua fitur premium terkunci sampai klinik berlangganan.
 export const TRIAL_LIMITS = {
   maxBranches: 1,
   maxUsers: 3,
-  disabledFeatures: new Set([
-    "ai",
-    "procurement",
-    "insurance",
-    "whatsapp",
-    "export",
-    "api-keys",
-  ]),
+  disabledFeatures: new Set<string>(FEATURE_KEY_VALUES),
 };
 
 type ScopedGuardResult =
@@ -87,13 +82,50 @@ export async function requireFeature(
     );
   }
 
-  if (clinic.subscription?.status === "TRIAL" && TRIAL_LIMITS.disabledFeatures.has(feature)) {
-    return fail(
-      "FEATURE_LOCKED",
-      "Fitur ini terkunci selama masa trial. Upgrade paket untuk membuka.",
-      403
-    );
+  if (clinic.subscription?.status === "TRIAL") {
+    if (TRIAL_LIMITS.disabledFeatures.has(feature)) {
+      return fail(
+        "FEATURE_LOCKED",
+        "Fitur ini terkunci selama masa trial. Upgrade paket untuk membuka.",
+        403
+      );
+    }
+    return null;
+  }
+
+  // Di luar masa trial, fitur premium mengikuti daftar fitur paket yang dipilih klinik —
+  // fitur yang bukan bagian dari FEATURE_KEY_VALUES (fitur dasar) selalu terbuka.
+  if ((FEATURE_KEY_VALUES as readonly string[]).includes(feature)) {
+    const plan = clinic.subscription?.planId
+      ? await SubscriptionPlan.findById(clinic.subscription.planId)
+      : null;
+    if (!plan || !plan.features.includes(feature)) {
+      return fail(
+        "FEATURE_LOCKED",
+        "Fitur ini tidak termasuk paket langganan Anda saat ini. Upgrade paket untuk membuka.",
+        403
+      );
+    }
   }
 
   return null;
+}
+
+// Versi non-guarded dari requireFeature() untuk UI (sidebar dsb): hitung feature key mana saja
+// yang terkunci untuk klinik ini supaya tampilan bisa menandai menu terkunci sebelum user klik.
+export async function getLockedFeatureKeys(
+  clinic: { subscription?: { status?: string; planId?: unknown } } | null
+): Promise<string[]> {
+  if (!clinic) return [...FEATURE_KEY_VALUES];
+
+  const status = clinic.subscription?.status;
+  if (status === "TRIAL") return [...TRIAL_LIMITS.disabledFeatures];
+  if (status === "EXPIRED" || status === "SUSPENDED") return [...FEATURE_KEY_VALUES];
+
+  const plan = clinic.subscription?.planId
+    ? await SubscriptionPlan.findById(clinic.subscription.planId)
+    : null;
+  if (!plan) return [...FEATURE_KEY_VALUES];
+
+  return FEATURE_KEY_VALUES.filter((key) => !plan.features.includes(key));
 }

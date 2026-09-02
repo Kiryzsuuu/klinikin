@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { SubscriptionPlan } from "@/models/SubscriptionPlan";
 import { guard, isError } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
+import { FEATURE_KEY_VALUES } from "@/lib/features";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -12,7 +13,7 @@ const updateSchema = z.object({
   priceMonthly: z.number().min(0).optional(),
   maxBranches: z.number().min(1).optional(),
   maxUsers: z.number().min(1).optional(),
-  features: z.array(z.string()).optional(),
+  features: z.array(z.enum(FEATURE_KEY_VALUES)).optional(),
   isActive: z.boolean().optional(),
 });
 

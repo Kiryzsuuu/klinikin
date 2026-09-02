@@ -21,6 +21,7 @@ import { getOrCreateSettings } from "@/models/SiteSettings";
 import { SubscriptionPlan } from "@/models/SubscriptionPlan";
 import SectionTitle from "@/components/landing/SectionTitle";
 import Faq from "@/components/landing/Faq";
+import { FEATURE_LABELS } from "@/lib/features";
 
 export const dynamic = "force-dynamic";
 
@@ -227,7 +228,7 @@ export default async function Home() {
                   {p.features.map((f: string) => (
                     <li key={f} className="flex items-center justify-center gap-2">
                       <Check className="w-4 h-4 text-green shrink-0" strokeWidth={2} />
-                      {f}
+                      {FEATURE_LABELS[f] || f}
                     </li>
                   ))}
                 </ul>

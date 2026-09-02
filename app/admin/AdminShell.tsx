@@ -40,12 +40,14 @@ type ClinicInfo = {
   trialEndsAt: string | null;
 } | null;
 
-const TRIAL_LOCKED_HREFS = new Set([
-  "/admin/insurance",
-  "/admin/procurement",
-  "/admin/chat",
-  "/admin/api-keys",
-]);
+// Menu yang gatenya berupa fitur premium (lihat lib/features.ts) — key di sini harus cocok
+// dengan feature key yang dipakai requireFeature() di route API-nya masing-masing.
+const HREF_FEATURE: Record<string, string> = {
+  "/admin/insurance": "insurance",
+  "/admin/procurement": "procurement",
+  "/admin/chat": "ai",
+  "/admin/api-keys": "api-keys",
+};
 
 const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -78,11 +80,13 @@ export default function AdminShell({
   user,
   clinic,
   theme,
+  lockedFeatures = [],
   children,
 }: {
   user: SessionUser;
   clinic: ClinicInfo;
   theme?: { primaryColor?: string; secondaryColor?: string; darkColor?: string };
+  lockedFeatures?: string[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -123,7 +127,8 @@ export default function AdminShell({
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin">
           {NAV.map((item) => {
             const active = pathname === item.href;
-            const locked = isTrial && TRIAL_LOCKED_HREFS.has(item.href);
+            const feature = HREF_FEATURE[item.href];
+            const locked = !!feature && lockedFeatures.includes(feature);
             return (
               <Link
                 key={item.href}
@@ -134,7 +139,7 @@ export default function AdminShell({
                     ? "bg-green text-white border-lime"
                     : "text-white/70 border-transparent hover:bg-white/10 hover:text-white"
                 } ${locked ? "opacity-50" : ""}`}
-                title={locked ? "Terkunci selama trial, upgrade untuk membuka" : undefined}
+                title={locked ? "Tidak termasuk paket Anda saat ini, upgrade untuk membuka" : undefined}
               >
                 <span className="flex items-center gap-3 min-w-0">
                   <item.icon className="w-[18px] h-[18px] shrink-0" strokeWidth={1.75} />

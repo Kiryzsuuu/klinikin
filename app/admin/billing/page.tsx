@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button, Card, Badge } from "@/components/ui";
+import { FEATURE_LABELS } from "@/lib/features";
 
 declare global {
   interface Window {
@@ -101,7 +102,7 @@ export default function BillingPage() {
             <ul className="text-sm text-dark/70 space-y-2 mb-4">
               <li className="pl-3 border-l-2 border-green">Maks {p.maxBranches} cabang</li>
               <li className="pl-3 border-l-2 border-green">Maks {p.maxUsers} pengguna</li>
-              {p.features.map((f) => <li key={f} className="pl-3 border-l-2 border-green">{f}</li>)}
+              {p.features.map((f) => <li key={f} className="pl-3 border-l-2 border-green">{FEATURE_LABELS[f] || f}</li>)}
             </ul>
             <Button className="w-full" disabled={payingId === p._id} onClick={() => subscribe(p._id)}>
               {payingId === p._id ? "Memproses..." : "Berlangganan"}

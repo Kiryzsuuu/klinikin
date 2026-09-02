@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/db";
 import { SubscriptionPlan } from "@/models/SubscriptionPlan";
 import { guard, isError } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
+import { getSession } from "@/lib/auth";
+import { FEATURE_KEY_VALUES } from "@/lib/features";
 
 const createSchema = z.object({
   name: z.string().min(2),
@@ -11,13 +13,16 @@ const createSchema = z.object({
   priceMonthly: z.number().min(0),
   maxBranches: z.number().min(1),
   maxUsers: z.number().min(1),
-  features: z.array(z.string()).default([]),
+  features: z.array(z.enum(FEATURE_KEY_VALUES)).default([]),
 });
 
-// GET publik: dipakai halaman pricing landing page & billing klinik
+// GET publik: dipakai halaman pricing landing page & billing klinik (hanya paket aktif).
+// Super admin yang login melihat semua paket termasuk yang nonaktif, untuk keperluan kelola paket.
 export async function GET() {
   await connectDB();
-  const plans = await SubscriptionPlan.find({ isActive: true }).sort({ priceMonthly: 1 });
+  const session = await getSession();
+  const filter = session?.role === "SUPER_ADMIN" ? {} : { isActive: true };
+  const plans = await SubscriptionPlan.find(filter).sort({ priceMonthly: 1 });
   return ok(plans);
 }
 

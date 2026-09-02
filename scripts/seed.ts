@@ -7,10 +7,12 @@ import { getOrCreateSettings } from "../models/SiteSettings";
 import { SubscriptionPlan } from "../models/SubscriptionPlan";
 import { createTrialClinic } from "../lib/tenant";
 
+// features: key dari lib/features.ts (FEATURE_KEYS), bukan teks bebas — dipakai requireFeature()
+// untuk menggerbang akses beneran, bukan sekadar teks marketing di halaman harga.
 const DEFAULT_PLANS = [
-  { name: "Starter", slug: "starter", priceMonthly: 299000, maxBranches: 1, maxUsers: 5, features: ["1 Cabang", "RME Dasar", "Kasir & Invoice", "Booking Online"] },
-  { name: "Pro", slug: "pro", priceMonthly: 799000, maxBranches: 5, maxUsers: 25, features: ["5 Cabang", "Semua fitur Starter", "Asisten AI", "Procurement & Asuransi", "Export Laporan"] },
-  { name: "Enterprise", slug: "enterprise", priceMonthly: 1999000, maxBranches: 999, maxUsers: 999, features: ["Cabang tanpa batas", "Semua fitur Pro", "API Publik", "Dukungan prioritas"] },
+  { name: "Starter", slug: "starter", priceMonthly: 299000, maxBranches: 1, maxUsers: 5, features: [] },
+  { name: "Pro", slug: "pro", priceMonthly: 799000, maxBranches: 5, maxUsers: 25, features: ["ai", "procurement", "insurance", "export"] },
+  { name: "Enterprise", slug: "enterprise", priceMonthly: 1999000, maxBranches: 999, maxUsers: 999, features: ["ai", "procurement", "insurance", "export", "api-keys"] },
 ];
 
 async function main() {

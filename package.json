@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
     "seed:superadmin": "tsx scripts/seedSuperAdmin.ts",
-    "migrate:accent-color": "tsx scripts/migrate-accent-color.ts"
+    "migrate:accent-color": "tsx scripts/migrate-accent-color.ts",
+    "migrate:plan-features": "tsx scripts/migrate-plan-features.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.35",

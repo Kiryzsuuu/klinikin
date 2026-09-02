@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
 import { Clinic } from "@/models/Clinic";
 import { getSession } from "@/lib/auth";
+import { getLockedFeatureKeys } from "@/lib/tenant";
 import AdminShell from "./AdminShell";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +17,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     session.clinicId ? Clinic.findById(session.clinicId) : null,
   ]);
   if (!user) redirect("/login");
+
+  const lockedFeatures = await getLockedFeatureKeys(clinic);
 
   return (
     <AdminShell
@@ -35,6 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           : null
       }
       theme={clinic?.settings?.theme}
+      lockedFeatures={lockedFeatures}
     >
       {children}
     </AdminShell>

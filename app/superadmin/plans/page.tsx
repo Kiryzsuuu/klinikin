@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Button, Card, Input, Label, Badge } from "@/components/ui";
+import { FEATURE_KEYS, FEATURE_LABELS } from "@/lib/features";
 
 type Plan = {
   _id: string;
@@ -14,13 +15,23 @@ type Plan = {
   isActive: boolean;
 };
 
-const emptyForm = { name: "", slug: "", priceMonthly: "", maxBranches: "1", maxUsers: "5", features: "" };
+type FormState = {
+  name: string;
+  slug: string;
+  priceMonthly: string;
+  maxBranches: string;
+  maxUsers: string;
+  features: string[];
+};
+
+const emptyForm: FormState = { name: "", slug: "", priceMonthly: "", maxBranches: "1", maxUsers: "5", features: [] };
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -40,22 +51,51 @@ export default function PlansPage() {
     load();
   }, [load]);
 
+  function openCreate() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setError("");
+    setShowForm(true);
+  }
+
+  function openEdit(p: Plan) {
+    setEditingId(p._id);
+    setForm({
+      name: p.name,
+      slug: p.slug,
+      priceMonthly: String(p.priceMonthly),
+      maxBranches: String(p.maxBranches),
+      maxUsers: String(p.maxUsers),
+      features: p.features,
+    });
+    setError("");
+    setShowForm(true);
+  }
+
+  function toggleFeature(key: string) {
+    setForm((f) => ({
+      ...f,
+      features: f.features.includes(key) ? f.features.filter((k) => k !== key) : [...f.features, key],
+    }));
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSaving(true);
     try {
-      const res = await fetch("/api/superadmin/plans", {
-        method: "POST",
+      const payload = {
+        name: form.name,
+        priceMonthly: Number(form.priceMonthly),
+        maxBranches: Number(form.maxBranches),
+        maxUsers: Number(form.maxUsers),
+        features: form.features,
+        ...(editingId ? {} : { slug: form.slug }),
+      };
+      const res = await fetch(editingId ? `/api/superadmin/plans/${editingId}` : "/api/superadmin/plans", {
+        method: editingId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          slug: form.slug,
-          priceMonthly: Number(form.priceMonthly),
-          maxBranches: Number(form.maxBranches),
-          maxUsers: Number(form.maxUsers),
-          features: form.features.split(",").map((f) => f.trim()).filter(Boolean),
-        }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!json.success) {
@@ -64,6 +104,7 @@ export default function PlansPage() {
       }
       setShowForm(false);
       setForm(emptyForm);
+      setEditingId(null);
       load();
     } finally {
       setSaving(false);
@@ -78,6 +119,17 @@ export default function PlansPage() {
     else alert(json.error?.message);
   }
 
+  async function reactivate(id: string) {
+    const res = await fetch(`/api/superadmin/plans/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: true }),
+    });
+    const json = await res.json();
+    if (json.success) load();
+    else alert(json.error?.message);
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -85,7 +137,7 @@ export default function PlansPage() {
           <h1 className="text-2xl font-semibold text-dark">Paket Langganan</h1>
           <p className="text-dark/60">Kelola paket harga yang ditawarkan ke klinik.</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>+ Tambah Paket</Button>
+        <Button onClick={openCreate}>+ Tambah Paket</Button>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -103,21 +155,33 @@ export default function PlansPage() {
             <ul className="text-sm text-dark/70 space-y-2 mb-4">
               <li className="pl-3 border-l-2 border-green">Maks {p.maxBranches} cabang</li>
               <li className="pl-3 border-l-2 border-green">Maks {p.maxUsers} pengguna</li>
-              {p.features.map((f) => <li key={f} className="pl-3 border-l-2 border-green">{f}</li>)}
+              {p.features.map((f) => (
+                <li key={f} className="pl-3 border-l-2 border-green">{FEATURE_LABELS[f] || f}</li>
+              ))}
+              {p.features.length === 0 && <li className="pl-3 border-l-2 border-dark/10 text-dark/40">Tanpa fitur premium</li>}
             </ul>
-            {p.isActive && (
-              <button onClick={() => deactivate(p._id)} className="text-red-500 text-sm font-medium hover:underline cursor-pointer">
-                Nonaktifkan
+            <div className="flex gap-4">
+              <button onClick={() => openEdit(p)} className="text-green text-sm font-medium hover:underline cursor-pointer">
+                Edit
               </button>
-            )}
+              {p.isActive ? (
+                <button onClick={() => deactivate(p._id)} className="text-red-500 text-sm font-medium hover:underline cursor-pointer">
+                  Nonaktifkan
+                </button>
+              ) : (
+                <button onClick={() => reactivate(p._id)} className="text-green text-sm font-medium hover:underline cursor-pointer">
+                  Aktifkan
+                </button>
+              )}
+            </div>
           </Card>
         ))}
       </div>
 
       {showForm && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-lg">
-            <h2 className="text-xl font-semibold text-dark mb-4">Tambah Paket</h2>
+          <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold text-dark mb-4">{editingId ? "Edit Paket" : "Tambah Paket"}</h2>
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
                 <Label>Nama Paket</Label>
@@ -125,7 +189,14 @@ export default function PlansPage() {
               </div>
               <div>
                 <Label>Slug (unik)</Label>
-                <Input required placeholder="starter" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
+                <Input
+                  required
+                  disabled={!!editingId}
+                  placeholder="starter"
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                />
+                {editingId && <p className="text-xs text-dark/40 mt-1">Slug tidak bisa diubah setelah dibuat.</p>}
               </div>
               <div>
                 <Label>Harga per Bulan (Rp)</Label>
@@ -142,8 +213,23 @@ export default function PlansPage() {
                 </div>
               </div>
               <div>
-                <Label>Fitur (pisahkan koma)</Label>
-                <Input value={form.features} onChange={(e) => setForm({ ...form, features: e.target.value })} />
+                <Label>Fitur Premium</Label>
+                <div className="space-y-2 border border-dark/15 rounded-sm p-3">
+                  {FEATURE_KEYS.map((f) => (
+                    <label key={f.key} className="flex items-center gap-2 text-sm text-dark/80 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.features.includes(f.key)}
+                        onChange={() => toggleFeature(f.key)}
+                      />
+                      {f.label}
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-dark/40 mt-1">
+                  Fitur yang dicentang terbuka untuk klinik dengan paket ini. Fitur dasar (RME, kasir, booking, dll)
+                  selalu terbuka di semua paket.
+                </p>
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}
               <div className="flex gap-3 pt-2">
