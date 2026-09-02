@@ -22,6 +22,7 @@ import {
   KeyRound,
   ScrollText,
   Lock,
+  UserCheck,
   CreditCard,
   Settings,
   type LucideIcon,
@@ -40,11 +41,20 @@ type ClinicInfo = {
   trialEndsAt: string | null;
 } | null;
 
-// Menu yang gatenya berupa fitur premium (lihat lib/features.ts) — key di sini harus cocok
-// dengan feature key yang dipakai requireFeature() di route API-nya masing-masing.
+// Menu yang gatenya berupa modul/fitur (lihat lib/features.ts) — key di sini harus cocok
+// dengan feature key yang dipakai requireFeature() di route API-nya masing-masing. Menu
+// administratif (Manajemen Cabang/User, Billing, Site Settings, dst) sengaja tidak dipetakan
+// di sini karena harus selalu bisa diakses.
 const HREF_FEATURE: Record<string, string> = {
+  "/admin/patients": "patients",
+  "/admin/pharmacy": "pharmacy",
+  "/admin/cashier": "cashier",
+  "/admin/bookings": "booking",
+  "/admin/lab": "lab",
   "/admin/insurance": "insurance",
   "/admin/procurement": "procurement",
+  "/admin/hr": "hr",
+  "/admin/accreditation": "accreditation",
   "/admin/chat": "ai",
   "/admin/api-keys": "api-keys",
 };
@@ -63,6 +73,7 @@ const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/admin/accreditation", label: "Akreditasi", icon: ClipboardList },
   { href: "/admin/chat", label: "Asisten AI", icon: Sparkles },
   { href: "/admin/users", label: "Manajemen User", icon: UserCog },
+  { href: "/admin/roles", label: "Role & Akses", icon: UserCheck },
   { href: "/admin/api-keys", label: "API Publik", icon: KeyRound },
   { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
   { href: "/admin/security", label: "Keamanan (MFA)", icon: Lock },

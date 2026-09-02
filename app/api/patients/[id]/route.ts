@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/db";
 import { Patient } from "@/models/Patient";
 import { Visit } from "@/models/Visit";
 import { CLINICAL_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 import { audit } from "@/lib/audit";
@@ -18,6 +18,8 @@ export async function GET(req: NextRequest, { params }: Params) {
   const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
   const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "patients");
+  if (featureError) return featureError;
 
   const { id } = await params;
   await connectDB();
@@ -38,6 +40,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
   const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
   const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "patients");
+  if (featureError) return featureError;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());
@@ -59,6 +63,8 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
   const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "patients");
+  if (featureError) return featureError;
 
   const { id } = await params;
   await connectDB();

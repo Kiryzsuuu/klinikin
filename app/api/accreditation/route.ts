@@ -3,7 +3,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { AccreditationItem } from "@/models/Accreditation";
 import { MANAGE_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const createSchema = z.object({
@@ -15,7 +15,9 @@ const createSchema = z.object({
 export async function GET(req: NextRequest) {
   const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
-  const { clinicFilter } = g;
+  const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "accreditation");
+  if (featureError) return featureError;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
@@ -31,6 +33,8 @@ export async function POST(req: NextRequest) {
   const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
   const { session } = g;
+  const featureError = await requireFeature(session, "accreditation");
+  if (featureError) return featureError;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());

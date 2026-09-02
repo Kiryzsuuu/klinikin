@@ -3,7 +3,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { LabOrder } from "@/models/LabOrder";
 import { CLINICAL_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 
@@ -19,7 +19,9 @@ type Params = { params: Promise<{ id: string }> };
 export async function PUT(req: NextRequest, { params }: Params) {
   const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
-  const { clinicFilter } = g;
+  const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "lab");
+  if (featureError) return featureError;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());

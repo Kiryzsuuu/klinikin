@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Button, Card, Input, Label, Badge } from "@/components/ui";
-import { FEATURE_KEYS, FEATURE_LABELS } from "@/lib/features";
+import { FEATURE_KEYS, FEATURE_LABELS, CORE_FEATURES } from "@/lib/features";
 
 type Plan = {
   _id: string;
@@ -24,7 +24,14 @@ type FormState = {
   features: string[];
 };
 
-const emptyForm: FormState = { name: "", slug: "", priceMonthly: "", maxBranches: "1", maxUsers: "5", features: [] };
+const emptyForm: FormState = {
+  name: "",
+  slug: "",
+  priceMonthly: "",
+  maxBranches: "1",
+  maxUsers: "5",
+  features: [...CORE_FEATURES],
+};
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -213,7 +220,7 @@ export default function PlansPage() {
                 </div>
               </div>
               <div>
-                <Label>Fitur Premium</Label>
+                <Label>Modul & Fitur</Label>
                 <div className="space-y-2 border border-dark/15 rounded-sm p-3">
                   {FEATURE_KEYS.map((f) => (
                     <label key={f.key} className="flex items-center gap-2 text-sm text-dark/80 cursor-pointer">
@@ -223,12 +230,16 @@ export default function PlansPage() {
                         onChange={() => toggleFeature(f.key)}
                       />
                       {f.label}
+                      {(CORE_FEATURES as readonly string[]).includes(f.key) && (
+                        <span className="text-[10px] uppercase tracking-wide text-dark/40">Inti</span>
+                      )}
                     </label>
                   ))}
                 </div>
                 <p className="text-xs text-dark/40 mt-1">
-                  Fitur yang dicentang terbuka untuk klinik dengan paket ini. Fitur dasar (RME, kasir, booking, dll)
-                  selalu terbuka di semua paket.
+                  Hanya modul yang dicentang yang terbuka untuk klinik dengan paket ini — tidak ada yang otomatis
+                  terbuka, termasuk modul inti (RME, farmasi, kasir, booking). Selama trial, modul inti tetap
+                  terbuka otomatis tanpa perlu paket.
                 </p>
               </div>
               {error && <p className="text-red-500 text-sm">{error}</p>}

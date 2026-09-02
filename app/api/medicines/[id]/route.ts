@@ -3,7 +3,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Medicine } from "@/models/Medicine";
 import { PHARMACY_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const updateSchema = z.object({}).passthrough();
@@ -13,7 +13,9 @@ type Params = { params: Promise<{ id: string }> };
 export async function PUT(req: NextRequest, { params }: Params) {
   const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
-  const { clinicFilter } = g;
+  const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "pharmacy");
+  if (featureError) return featureError;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());
@@ -28,7 +30,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
 export async function DELETE(_req: NextRequest, { params }: Params) {
   const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
-  const { clinicFilter } = g;
+  const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "pharmacy");
+  if (featureError) return featureError;
 
   const { id } = await params;
   await connectDB();

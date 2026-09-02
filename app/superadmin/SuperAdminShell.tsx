@@ -4,11 +4,12 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
-import { LayoutDashboard, Building2, Package, CreditCard, Settings, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Building2, Package, CreditCard, Settings, UserCog, type LucideIcon } from "lucide-react";
 
 const NAV: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/superadmin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/superadmin/clinics", label: "Klinik", icon: Building2 },
+  { href: "/superadmin/users", label: "Manajemen User", icon: UserCog },
   { href: "/superadmin/plans", label: "Paket Langganan", icon: Package },
   { href: "/superadmin/payments", label: "Pembayaran", icon: CreditCard },
   { href: "/superadmin/settings", label: "Site Settings", icon: Settings },

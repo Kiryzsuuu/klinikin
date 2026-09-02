@@ -3,17 +3,35 @@ import { fail } from "@/lib/response";
 import { connectDB } from "@/lib/db";
 import { Clinic } from "@/models/Clinic";
 import { SubscriptionPlan } from "@/models/SubscriptionPlan";
-import { FEATURE_KEY_VALUES } from "@/lib/features";
+import {
+  FEATURE_KEY_VALUES,
+  TRIAL_DISABLED_FEATURES,
+  DEFAULT_ROLE_FEATURES,
+  CONFIGURABLE_ROLES,
+  type ConfigurableRole,
+} from "@/lib/features";
 import type { SessionPayload } from "@/lib/jwt";
 
 export { isError };
 
-// Batasan fitur selama masa TRIAL — semua fitur premium terkunci sampai klinik berlangganan.
+// Batasan fitur selama masa TRIAL — semua modul non-inti terkunci sampai klinik berlangganan.
 export const TRIAL_LIMITS = {
   maxBranches: 1,
   maxUsers: 3,
-  disabledFeatures: new Set<string>(FEATURE_KEY_VALUES),
+  disabledFeatures: new Set<string>(TRIAL_DISABLED_FEATURES),
 };
+
+const ADMIN_ROLES = new Set(["OWNER", "ADMIN_PUSAT"]);
+
+function isConfigurableRole(role: string): role is ConfigurableRole {
+  return (CONFIGURABLE_ROLES as readonly string[]).includes(role);
+}
+
+function roleAllowedFeatures(clinic: { rolePermissions?: unknown }, role: string): string[] {
+  if (!isConfigurableRole(role)) return [...FEATURE_KEY_VALUES];
+  const rolePermissions = clinic.rolePermissions as Record<string, string[]> | undefined;
+  return rolePermissions?.[role] ?? DEFAULT_ROLE_FEATURES[role];
+}
 
 type ScopedGuardResult =
   | { session: SessionPayload; clinicFilter: Record<string, unknown> }
@@ -63,7 +81,10 @@ export async function createTrialClinic(name: string, ownerEmail: string) {
   });
 }
 
-// Cek apakah suatu fitur terkunci untuk klinik sesi ini (dipanggil di route yang butuh gating trial).
+// Cek apakah suatu fitur terkunci untuk sesi ini — dipanggil di setiap route yang mewakili
+// satu modul (lihat FEATURE_KEYS). Menggerbang dalam dua lapis independen:
+//  1) Paket langganan klinik (trial vs paket ACTIVE, modul inti selalu terbuka)
+//  2) Role staf dalam klinik itu (dikustomisasi lewat Clinic.settings.rolePermissions)
 export async function requireFeature(
   session: SessionPayload,
   feature: string
@@ -83,6 +104,8 @@ export async function requireFeature(
   }
 
   if (clinic.subscription?.status === "TRIAL") {
+    // Modul inti (lihat CORE_FEATURES) sengaja tidak pernah ada di TRIAL_LIMITS.disabledFeatures,
+    // supaya trial tetap bisa mendemonstrasikan produk inti tanpa perlu paket terpasang dulu.
     if (TRIAL_LIMITS.disabledFeatures.has(feature)) {
       return fail(
         "FEATURE_LOCKED",
@@ -90,12 +113,9 @@ export async function requireFeature(
         403
       );
     }
-    return null;
-  }
-
-  // Di luar masa trial, fitur premium mengikuti daftar fitur paket yang dipilih klinik —
-  // fitur yang bukan bagian dari FEATURE_KEY_VALUES (fitur dasar) selalu terbuka.
-  if ((FEATURE_KEY_VALUES as readonly string[]).includes(feature)) {
+  } else {
+    // Di luar trial, TIDAK ADA modul yang otomatis terbuka — semuanya, termasuk modul inti,
+    // mengikuti persis daftar fitur yang dicentang super admin pada paket klinik ini.
     const plan = clinic.subscription?.planId
       ? await SubscriptionPlan.findById(clinic.subscription.planId)
       : null;
@@ -108,24 +128,48 @@ export async function requireFeature(
     }
   }
 
+  if (!ADMIN_ROLES.has(session.role) && (FEATURE_KEY_VALUES as readonly string[]).includes(feature)) {
+    const allowed = roleAllowedFeatures(clinic, session.role);
+    if (!allowed.includes(feature)) {
+      return fail(
+        "FEATURE_LOCKED",
+        "Fitur ini tidak termasuk akses role Anda. Hubungi admin klinik untuk membuka.",
+        403
+      );
+    }
+  }
+
   return null;
 }
 
 // Versi non-guarded dari requireFeature() untuk UI (sidebar dsb): hitung feature key mana saja
-// yang terkunci untuk klinik ini supaya tampilan bisa menandai menu terkunci sebelum user klik.
+// yang terkunci untuk sesi ini supaya tampilan bisa menandai menu terkunci sebelum user klik.
 export async function getLockedFeatureKeys(
-  clinic: { subscription?: { status?: string; planId?: unknown } } | null
+  clinic: {
+    subscription?: { status?: string; planId?: unknown };
+    rolePermissions?: unknown;
+  } | null,
+  role: string
 ): Promise<string[]> {
   if (!clinic) return [...FEATURE_KEY_VALUES];
+  if (role === "SUPER_ADMIN") return [];
 
   const status = clinic.subscription?.status;
-  if (status === "TRIAL") return [...TRIAL_LIMITS.disabledFeatures];
-  if (status === "EXPIRED" || status === "SUSPENDED") return [...FEATURE_KEY_VALUES];
+  let planLocked: string[];
+  if (status === "TRIAL") {
+    planLocked = [...TRIAL_LIMITS.disabledFeatures];
+  } else if (status === "EXPIRED" || status === "SUSPENDED") {
+    planLocked = [...FEATURE_KEY_VALUES];
+  } else {
+    const plan = clinic.subscription?.planId
+      ? await SubscriptionPlan.findById(clinic.subscription.planId)
+      : null;
+    planLocked = FEATURE_KEY_VALUES.filter((key) => !(plan?.features.includes(key) ?? false));
+  }
 
-  const plan = clinic.subscription?.planId
-    ? await SubscriptionPlan.findById(clinic.subscription.planId)
-    : null;
-  if (!plan) return [...FEATURE_KEY_VALUES];
+  const roleLocked = ADMIN_ROLES.has(role)
+    ? []
+    : FEATURE_KEY_VALUES.filter((key) => !roleAllowedFeatures(clinic, role).includes(key));
 
-  return FEATURE_KEY_VALUES.filter((key) => !plan.features.includes(key));
+  return [...new Set([...planLocked, ...roleLocked])];
 }

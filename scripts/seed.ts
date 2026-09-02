@@ -8,11 +8,14 @@ import { SubscriptionPlan } from "../models/SubscriptionPlan";
 import { createTrialClinic } from "../lib/tenant";
 
 // features: key dari lib/features.ts (FEATURE_KEYS), bukan teks bebas — dipakai requireFeature()
-// untuk menggerbang akses beneran, bukan sekadar teks marketing di halaman harga.
+// untuk menggerbang akses beneran, bukan sekadar teks marketing di halaman harga. Tidak ada
+// modul yang otomatis terbuka di luar trial, jadi modul inti (patients/pharmacy/cashier/booking)
+// tetap harus dicantumkan eksplisit di setiap paket.
+const CORE = ["patients", "pharmacy", "cashier", "booking"];
 const DEFAULT_PLANS = [
-  { name: "Starter", slug: "starter", priceMonthly: 299000, maxBranches: 1, maxUsers: 5, features: [] },
-  { name: "Pro", slug: "pro", priceMonthly: 799000, maxBranches: 5, maxUsers: 25, features: ["ai", "procurement", "insurance", "export"] },
-  { name: "Enterprise", slug: "enterprise", priceMonthly: 1999000, maxBranches: 999, maxUsers: 999, features: ["ai", "procurement", "insurance", "export", "api-keys"] },
+  { name: "Starter", slug: "starter", priceMonthly: 299000, maxBranches: 1, maxUsers: 5, features: CORE },
+  { name: "Pro", slug: "pro", priceMonthly: 799000, maxBranches: 5, maxUsers: 25, features: [...CORE, "lab", "hr", "accreditation", "ai", "procurement", "insurance", "export"] },
+  { name: "Enterprise", slug: "enterprise", priceMonthly: 1999000, maxBranches: 999, maxUsers: 999, features: [...CORE, "lab", "hr", "accreditation", "ai", "procurement", "insurance", "export", "api-keys"] },
 ];
 
 async function main() {

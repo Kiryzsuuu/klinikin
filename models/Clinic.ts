@@ -16,6 +16,11 @@ const clinicSchema = new Schema(
     logoBase64: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
 
+    // Akses fitur per role staf dalam klinik ini, mis. { DOKTER: ["patients","booking"], ... }.
+    // Diatur sendiri oleh OWNER/ADMIN_PUSAT lewat /admin/roles. Role yang tidak punya entri di
+    // sini memakai DEFAULT_ROLE_FEATURES dari lib/features.ts. OWNER/ADMIN_PUSAT selalu full akses.
+    rolePermissions: { type: Schema.Types.Mixed, default: {} },
+
     // Kustomisasi halaman publik klinik (/c/[slug]) — diatur oleh klinik sendiri
     // (OWNER/ADMIN_PUSAT) atau oleh super admin, TIDAK global lintas klinik.
     settings: {

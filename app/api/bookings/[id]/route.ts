@@ -6,7 +6,7 @@ import { Branch } from "@/models/Branch";
 import { Patient, generateMedicalRecordNo } from "@/models/Patient";
 import { Visit, generateVisitNo } from "@/models/Visit";
 import { CLINICAL_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const updateSchema = z.object({
@@ -20,6 +20,8 @@ export async function PUT(req: NextRequest, { params }: Params) {
   const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
   const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "booking");
+  if (featureError) return featureError;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());

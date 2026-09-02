@@ -3,7 +3,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Medicine, StockTransfer } from "@/models/Medicine";
 import { PHARMACY_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const schema = z.object({
@@ -18,6 +18,8 @@ export async function POST(req: NextRequest) {
   const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
   const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "pharmacy");
+  if (featureError) return featureError;
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());

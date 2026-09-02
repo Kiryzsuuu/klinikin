@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ]);
   if (!user) redirect("/login");
 
-  const lockedFeatures = await getLockedFeatureKeys(clinic);
+  const lockedFeatures = await getLockedFeatureKeys(clinic, user.role);
 
   return (
     <AdminShell
