@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
+import { LayoutDashboard, Building2, Package, CreditCard, Settings, type LucideIcon } from "lucide-react";
 
-const NAV = [
-  { href: "/superadmin", label: "Dashboard" },
-  { href: "/superadmin/clinics", label: "Klinik" },
-  { href: "/superadmin/plans", label: "Paket Langganan" },
-  { href: "/superadmin/payments", label: "Pembayaran" },
-  { href: "/superadmin/settings", label: "Site Settings" },
+const NAV: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/superadmin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/superadmin/clinics", label: "Klinik", icon: Building2 },
+  { href: "/superadmin/plans", label: "Paket Langganan", icon: Package },
+  { href: "/superadmin/payments", label: "Pembayaran", icon: CreditCard },
+  { href: "/superadmin/settings", label: "Site Settings", icon: Settings },
 ];
 
 export default function SuperAdminShell({
@@ -55,6 +56,7 @@ export default function SuperAdminShell({
                     : "text-white/70 border-transparent hover:bg-white/10 hover:text-white"
                 }`}
               >
+                <item.icon className="w-[18px] h-[18px] shrink-0 mr-3" strokeWidth={1.75} />
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             );

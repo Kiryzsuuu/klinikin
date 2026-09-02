@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MapPin, Phone, ArrowRight } from "lucide-react";
 import { connectDB } from "@/lib/db";
 import { Clinic } from "@/models/Clinic";
+import { Branch } from "@/models/Branch";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,8 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
   const clinic = await Clinic.findOne({ slug, isActive: true });
   if (!clinic) notFound();
 
+  const branches = await Branch.find({ clinicId: clinic._id, isActive: true }).select("name address contact").limit(6);
+
   const s = clinic.settings;
   const heroTitle = s?.hero?.title || clinic.name;
   const primary = s?.theme?.primaryColor || "#57D131";
@@ -22,34 +26,30 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
 
   return (
     <main className="flex-1">
-      <header className="flex items-center justify-between px-6 lg:px-16 py-6 relative z-10">
-        <div className="flex items-center gap-3">
-          {clinic.logoBase64 ? (
-            <Image src={clinic.logoBase64} alt={clinic.name} width={40} height={40} unoptimized className="rounded-2xl w-10 h-10 object-cover" />
-          ) : (
-            <div
-              className="w-10 h-10 rounded-2xl flex items-center justify-center text-white font-bold"
+      <header className="sticky top-0 z-20 bg-bg/80 backdrop-blur border-b border-dark/5">
+        <div className="flex items-center justify-between px-6 lg:px-16 py-4 max-w-7xl mx-auto">
+          <div className="flex items-center gap-3">
+            {clinic.logoBase64 ? (
+              <Image src={clinic.logoBase64} alt={clinic.name} width={40} height={40} unoptimized className="rounded-2xl w-10 h-10 object-cover" />
+            ) : (
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white font-bold" style={{ background: primary }}>
+                {clinic.name.charAt(0)}
+              </div>
+            )}
+            <span className="text-lg font-bold text-dark">{clinic.name}</span>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link href={`/c/${slug}/portal/login`} className="px-3 py-2 text-sm font-medium text-dark/70 hover:text-dark">
+              Portal Pasien
+            </Link>
+            <Link
+              href={`/c/${slug}/booking`}
+              className="px-5 py-2.5 text-white rounded-2xl text-sm font-semibold shadow-lg"
               style={{ background: primary }}
             >
-              {clinic.name.charAt(0)}
-            </div>
-          )}
-          <span className={`text-lg font-bold ${hasBackground ? "text-white" : "text-dark"}`}>{clinic.name}</span>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <Link
-            href={`/c/${slug}/portal/login`}
-            className={`px-3 py-2 text-sm font-medium ${hasBackground ? "text-white/80 hover:text-white" : "text-dark/70 hover:text-dark"}`}
-          >
-            Portal Pasien
-          </Link>
-          <Link
-            href={`/c/${slug}/booking`}
-            className="px-5 py-2.5 text-white rounded-2xl text-sm font-semibold shadow-lg"
-            style={{ background: primary }}
-          >
-            {s?.hero?.ctaText || "Booking Sekarang"}
-          </Link>
+              {s?.hero?.ctaText || "Booking Sekarang"}
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -90,10 +90,11 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
             )}
             <Link
               href={`/c/${slug}/booking`}
-              className="inline-block px-8 py-4 text-white rounded-2xl font-semibold shadow-xl hover:brightness-95"
+              className="inline-flex items-center gap-2 px-8 py-4 text-white rounded-2xl font-semibold shadow-xl hover:brightness-95"
               style={{ background: primary }}
             >
               {s?.hero?.ctaText || "Booking Sekarang"}
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -118,6 +119,34 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
           )}
         </div>
       </section>
+
+      {branches.length > 0 && (
+        <section className="px-6 lg:px-16 py-16">
+          <div className="text-center mb-12 max-w-xl mx-auto">
+            <p className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: primary }}>Lokasi</p>
+            <h2 className="text-3xl font-extrabold text-dark">Cabang Kami</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {branches.map((b) => (
+              <div key={String(b._id)} className="bg-white rounded-3xl p-7 shadow-sm border border-dark/5">
+                <h3 className="font-bold text-dark mb-3">{b.name}</h3>
+                {b.address?.city && (
+                  <p className="flex items-start gap-2 text-sm text-dark/60 mb-1.5">
+                    <MapPin className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.75} />
+                    <span>{[b.address.street, b.address.city].filter(Boolean).join(", ")}</span>
+                  </p>
+                )}
+                {b.contact?.phone && (
+                  <p className="flex items-center gap-2 text-sm text-dark/60">
+                    <Phone className="w-4 h-4 shrink-0" strokeWidth={1.75} />
+                    <span>{b.contact.phone}</span>
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {s?.gallery && s.gallery.length > 0 && (
         <section className="px-6 lg:px-16 py-16 bg-white/60">
@@ -144,10 +173,11 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
           </div>
           <Link
             href={`/c/${slug}/booking`}
-            className="shrink-0 px-8 py-4 rounded-2xl font-semibold shadow-xl hover:brightness-95"
+            className="shrink-0 inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold shadow-xl hover:brightness-95"
             style={{ background: secondary, color: darkColor }}
           >
             Booking Sekarang
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </section>

@@ -4,6 +4,27 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
+import {
+  LayoutDashboard,
+  Building2,
+  Stethoscope,
+  Pill,
+  Receipt,
+  CalendarCheck,
+  FlaskConical,
+  ShieldCheck,
+  Package,
+  Users,
+  ClipboardList,
+  Sparkles,
+  UserCog,
+  KeyRound,
+  ScrollText,
+  Lock,
+  CreditCard,
+  Settings,
+  type LucideIcon,
+} from "lucide-react";
 
 type SessionUser = {
   name: string;
@@ -25,25 +46,25 @@ const TRIAL_LOCKED_HREFS = new Set([
   "/admin/api-keys",
 ]);
 
-const NAV = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/branches", label: "Manajemen Cabang" },
-  { href: "/admin/patients", label: "Data Pasien / RME" },
-  { href: "/admin/pharmacy", label: "Farmasi & Stok" },
-  { href: "/admin/cashier", label: "Kasir & Invoice" },
-  { href: "/admin/bookings", label: "Booking Pasien" },
-  { href: "/admin/lab", label: "Lab & Radiologi" },
-  { href: "/admin/insurance", label: "Asuransi Swasta" },
-  { href: "/admin/procurement", label: "Procurement Obat" },
-  { href: "/admin/hr", label: "SDM & Jadwal" },
-  { href: "/admin/accreditation", label: "Akreditasi" },
-  { href: "/admin/chat", label: "Asisten AI" },
-  { href: "/admin/users", label: "Manajemen User" },
-  { href: "/admin/api-keys", label: "API Publik" },
-  { href: "/admin/audit-log", label: "Audit Log" },
-  { href: "/admin/security", label: "Keamanan (MFA)" },
-  { href: "/admin/billing", label: "Langganan & Billing" },
-  { href: "/admin/settings", label: "Site Settings" },
+const NAV: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/branches", label: "Manajemen Cabang", icon: Building2 },
+  { href: "/admin/patients", label: "Data Pasien / RME", icon: Stethoscope },
+  { href: "/admin/pharmacy", label: "Farmasi & Stok", icon: Pill },
+  { href: "/admin/cashier", label: "Kasir & Invoice", icon: Receipt },
+  { href: "/admin/bookings", label: "Booking Pasien", icon: CalendarCheck },
+  { href: "/admin/lab", label: "Lab & Radiologi", icon: FlaskConical },
+  { href: "/admin/insurance", label: "Asuransi Swasta", icon: ShieldCheck },
+  { href: "/admin/procurement", label: "Procurement Obat", icon: Package },
+  { href: "/admin/hr", label: "SDM & Jadwal", icon: Users },
+  { href: "/admin/accreditation", label: "Akreditasi", icon: ClipboardList },
+  { href: "/admin/chat", label: "Asisten AI", icon: Sparkles },
+  { href: "/admin/users", label: "Manajemen User", icon: UserCog },
+  { href: "/admin/api-keys", label: "API Publik", icon: KeyRound },
+  { href: "/admin/audit-log", label: "Audit Log", icon: ScrollText },
+  { href: "/admin/security", label: "Keamanan (MFA)", icon: Lock },
+  { href: "/admin/billing", label: "Langganan & Billing", icon: CreditCard },
+  { href: "/admin/settings", label: "Site Settings", icon: Settings },
 ];
 
 function daysLeft(dateStr: string | null) {
@@ -103,7 +124,10 @@ export default function AdminShell({
                 } ${locked ? "opacity-50" : ""}`}
                 title={locked ? "Terkunci selama trial, upgrade untuk membuka" : undefined}
               >
-                <span className="text-sm font-medium">{item.label}</span>
+                <span className="flex items-center gap-3 min-w-0">
+                  <item.icon className="w-[18px] h-[18px] shrink-0" strokeWidth={1.75} />
+                  <span className="text-sm font-medium truncate">{item.label}</span>
+                </span>
                 {locked && (
                   <span className="text-[10px] uppercase tracking-wide bg-white/10 px-1.5 py-0.5 rounded-md shrink-0">
                     Terkunci
