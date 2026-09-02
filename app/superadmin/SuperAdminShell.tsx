@@ -31,9 +31,9 @@ export default function SuperAdminShell({
   }
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex h-screen w-full overflow-hidden">
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-dark text-white flex flex-col transition-transform ${
+        className={`fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 h-screen w-64 shrink-0 bg-dark text-white flex flex-col transition-transform ${
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -42,7 +42,7 @@ export default function SuperAdminShell({
           <p className="text-xs text-white/50">Super Admin</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin">
           {NAV.map((item) => {
             const active = pathname === item.href;
             return (
@@ -85,14 +85,14 @@ export default function SuperAdminShell({
         />
       )}
 
-      <div className="flex-1 min-w-0 flex flex-col">
-        <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-dark/10">
+      <div className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+        <header className="lg:hidden shrink-0 sticky top-0 z-20 flex items-center justify-between p-4 bg-white border-b border-dark/10">
           <p className="font-semibold text-dark">KlinikKita · Super Admin</p>
           <button onClick={() => setOpen(true)} className="text-dark text-sm font-medium cursor-pointer">
             Menu
           </button>
         </header>
-        <main className="flex-1 p-6 lg:p-8 bg-bg">{children}</main>
+        <main className="flex-1 overflow-y-auto scrollbar-thin p-6 lg:p-8 bg-bg">{children}</main>
       </div>
     </div>
   );

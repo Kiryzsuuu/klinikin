@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
-    "seed:superadmin": "tsx scripts/seedSuperAdmin.ts"
+    "seed:superadmin": "tsx scripts/seedSuperAdmin.ts",
+    "migrate:accent-color": "tsx scripts/migrate-accent-color.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.35",

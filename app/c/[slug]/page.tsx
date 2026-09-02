@@ -21,7 +21,7 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
   const s = clinic.settings;
   const heroTitle = s?.hero?.title || clinic.name;
   const primary = s?.theme?.primaryColor || "#57D131";
-  const secondary = s?.theme?.secondaryColor || "#9EF40B";
+  const secondary = s?.theme?.secondaryColor || "#D9A441";
   const darkColor = s?.theme?.darkColor || "#406661";
 
   return (

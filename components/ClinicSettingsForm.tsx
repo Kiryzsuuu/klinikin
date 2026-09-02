@@ -16,6 +16,7 @@ type ClinicSettings = {
     description: string;
     heroImageBase64: string;
     backgroundImageBase64: string;
+    loginImageBase64: string;
     theme: { primaryColor: string; secondaryColor: string; darkColor: string };
     hero: { title: string; subtitle: string; ctaText: string };
     socials: { instagram: string; facebook: string; tiktok: string; whatsapp: string };
@@ -148,9 +149,15 @@ export default function ClinicSettingsForm({
             value={clinic.settings.backgroundImageBase64}
             onChange={(f) => onImage(f, (b) => updateSettings({ backgroundImageBase64: b }))}
           />
+          <ImagePicker
+            label="Gambar Halaman Login Portal Pasien"
+            value={clinic.settings.loginImageBase64}
+            onChange={(f) => onImage(f, (b) => updateSettings({ loginImageBase64: b }))}
+          />
         </div>
         <p className="text-xs text-dark/40 mt-2">
-          Gambar latar belakang ditampilkan penuh di belakang halaman publik klinik Anda.
+          Gambar latar belakang ditampilkan penuh di belakang halaman publik klinik Anda. Gambar halaman login
+          ditampilkan di sisi kiri form masuk portal pasien.
         </p>
       </Card>
 

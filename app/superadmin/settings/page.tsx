@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Button, Card, Input, Label } from "@/components/ui";
+import { Button, Card, Input, Label, Select } from "@/components/ui";
 import { fileToBase64 } from "@/lib/fileToBase64";
 
 type Settings = {
@@ -13,6 +13,7 @@ type Settings = {
   faviconBase64: string;
   heroImageBase64: string;
   backgroundImageBase64: string;
+  loginImageBase64: string;
   theme: {
     primaryColor: string;
     secondaryColor: string;
@@ -25,6 +26,8 @@ type Settings = {
   socials: { instagram: string; facebook: string; tiktok: string; youtube: string };
   hero: { title: string; subtitle: string; ctaText: string; ctaLink: string };
   features: { registrationEnabled: boolean; maintenanceMode: boolean; maintenanceMessage: string };
+  faqs: { q: string; a: string }[];
+  faqLayout: "accordion" | "grid";
 };
 
 export default function SettingsPage() {
@@ -51,8 +54,20 @@ export default function SettingsPage() {
     setSettings((s) => (s ? { ...s, [key]: { ...(s[key] as object), ...patch } } : s));
   }
 
+  function addFaq() {
+    setSettings((s) => (s ? { ...s, faqs: [...s.faqs, { q: "", a: "" }] } : s));
+  }
+
+  function updateFaq(index: number, patch: Partial<{ q: string; a: string }>) {
+    setSettings((s) => (s ? { ...s, faqs: s.faqs.map((f, i) => (i === index ? { ...f, ...patch } : f)) } : s));
+  }
+
+  function removeFaq(index: number) {
+    setSettings((s) => (s ? { ...s, faqs: s.faqs.filter((_, i) => i !== index) } : s));
+  }
+
   async function onImageChange(
-    field: "logoBase64" | "faviconBase64" | "heroImageBase64" | "backgroundImageBase64",
+    field: "logoBase64" | "faviconBase64" | "heroImageBase64" | "backgroundImageBase64" | "loginImageBase64",
     file: File | undefined
   ) {
     if (!file) return;
@@ -132,9 +147,15 @@ export default function SettingsPage() {
               value={settings.backgroundImageBase64}
               onChange={(f) => onImageChange("backgroundImageBase64", f)}
             />
+            <ImagePicker
+              label="Gambar Halaman Login Staf"
+              value={settings.loginImageBase64}
+              onChange={(f) => onImageChange("loginImageBase64", f)}
+            />
           </div>
           <p className="text-xs text-dark/40 mt-2">
-            Gambar latar belakang ditampilkan penuh di belakang halaman utama, di bawah lapisan warna tema.
+            Gambar latar belakang ditampilkan penuh di belakang halaman utama, di bawah lapisan warna tema. Gambar
+            halaman login ditampilkan di sisi kiri form masuk staf (/login).
           </p>
         </Card>
 
@@ -247,6 +268,47 @@ export default function SettingsPage() {
               />
             </div>
           )}
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-dark">FAQ Landing Page</h2>
+            <div>
+              <Label>Tampilan</Label>
+              <Select
+                value={settings.faqLayout}
+                onChange={(e) => update("faqLayout", e.target.value as Settings["faqLayout"])}
+                className="!py-1.5 !w-40"
+              >
+                <option value="accordion">Ringkas (accordion)</option>
+                <option value="grid">Grid 2 kolom</option>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {settings.faqs.map((f, i) => (
+              <div key={i} className="border border-dark/10 rounded-sm p-4 space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="!mb-0">Pertanyaan {i + 1}</Label>
+                  <button type="button" onClick={() => removeFaq(i)} className="text-red-500 text-xs font-medium hover:underline cursor-pointer shrink-0">
+                    Hapus
+                  </button>
+                </div>
+                <Input value={f.q} onChange={(e) => updateFaq(i, { q: e.target.value })} placeholder="Pertanyaan" />
+                <textarea
+                  className="w-full px-4 py-2.5 rounded-sm border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
+                  rows={2}
+                  value={f.a}
+                  onChange={(e) => updateFaq(i, { a: e.target.value })}
+                  placeholder="Jawaban"
+                />
+              </div>
+            ))}
+            {settings.faqs.length === 0 && <p className="text-dark/40 text-sm">Belum ada FAQ.</p>}
+          </div>
+          <Button type="button" variant="ghost" onClick={addFaq} className="mt-3 !px-4 !py-2 text-sm">
+            + Tambah FAQ
+          </Button>
         </Card>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}

@@ -20,6 +20,7 @@ import { connectDB } from "@/lib/db";
 import { getOrCreateSettings } from "@/models/SiteSettings";
 import { SubscriptionPlan } from "@/models/SubscriptionPlan";
 import SectionTitle from "@/components/landing/SectionTitle";
+import Faq from "@/components/landing/Faq";
 
 export const dynamic = "force-dynamic";
 
@@ -42,13 +43,6 @@ const STATS = [
   { icon: Building2, value: "Tanpa Batas", label: "Cabang di paket Enterprise" },
   { icon: CalendarCheck, value: "24/7", label: "Booking online untuk pasien" },
   { icon: ShieldCheck, value: "MFA", label: "Keamanan akun staf" },
-];
-
-const FAQS = [
-  { q: "Apakah butuh kartu kredit untuk mencoba", a: "Tidak. Trial 14 hari langsung aktif begitu klinik selesai mendaftar, tanpa perlu memasukkan data pembayaran." },
-  { q: "Bagaimana jika klinik saya punya lebih dari satu cabang", a: "KlinikKita didesain untuk multi-cabang sejak awal. Satu akun klinik bisa mengelola semua cabangnya dari satu dashboard." },
-  { q: "Apakah data klinik saya tercampur dengan klinik lain", a: "Tidak. Setiap klinik memiliki data yang terisolasi sepenuhnya, staf dan pasien klinik lain tidak akan pernah terlihat." },
-  { q: "Bagaimana cara berlangganan setelah masa trial habis", a: "Pilih paket di halaman Billing pada dashboard admin, pembayaran diproses aman melalui Midtrans." },
 ];
 
 export default async function Home() {
@@ -77,7 +71,7 @@ export default async function Home() {
       style={
         {
           "--color-green": theme.primaryColor || "#57D131",
-          "--color-lime": theme.secondaryColor || "#9EF40B",
+          "--color-lime": theme.secondaryColor || "#D9A441",
           "--color-dark": theme.darkColor || "#406661",
         } as CSSProperties
       }
@@ -251,17 +245,12 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="faq" className="px-6 lg:px-16 py-20">
-        <SectionTitle eyebrow="Pertanyaan Umum" title="Yang Sering Ditanyakan" />
-        <div className="max-w-3xl mx-auto space-y-4">
-          {FAQS.map((f) => (
-            <div key={f.q} className="bg-white shadow-[0px_0_25px_rgba(0,0,0,0.06)] p-6 border-l-4 border-green">
-              <h3 className="font-bold text-dark mb-2">{f.q}</h3>
-              <p className="text-sm text-dark/60 leading-relaxed">{f.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {settings.faqs?.length > 0 && (
+        <section id="faq" className="px-6 lg:px-16 py-16">
+          <SectionTitle eyebrow="Pertanyaan Umum" title="Yang Sering Ditanyakan" />
+          <Faq faqs={settings.faqs} layout={settings.faqLayout || "accordion"} />
+        </section>
+      )}
 
       <footer className="px-6 lg:px-16 py-14 bg-dark text-white">
         <div className="max-w-5xl mx-auto grid sm:grid-cols-3 gap-8 mb-10">
@@ -287,7 +276,7 @@ export default async function Home() {
           </div>
         </div>
         <div className="max-w-5xl mx-auto pt-6 border-t border-white/10 text-sm text-white/40">
-          &copy; {new Date().getFullYear()} {settings.siteName}. Semua hak dilindungi.
+          &copy; {new Date().getFullYear()} Nusa Inspira Teknologi (RFS). Semua hak dilindungi.
         </div>
       </footer>
     </main>

@@ -96,10 +96,10 @@ export default function AdminShell({
   }
 
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex h-screen w-full overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-dark text-white flex flex-col transition-transform ${
+        className={`fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 h-screen w-64 shrink-0 bg-dark text-white flex flex-col transition-transform ${
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -177,37 +177,39 @@ export default function AdminShell({
       )}
 
       {/* Main content */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-dark/10">
+      <div className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+        <header className="lg:hidden shrink-0 sticky top-0 z-20 flex items-center justify-between p-4 bg-white border-b border-dark/10">
           <p className="font-semibold text-dark">KlinikKita</p>
           <button onClick={() => setOpen(true)} className="text-dark text-sm font-medium cursor-pointer">
             Menu
           </button>
         </header>
-        {isTrial && (
-          <div className="px-6 lg:px-8 pt-4">
-            <div className="bg-lime/30 border border-lime text-dark text-sm rounded-sm px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-              <span>
-                Anda sedang di masa trial{trialDays !== null ? `, ${trialDays} hari tersisa` : ""}. Sebagian fitur
-                terkunci.
-              </span>
-              <Link href="/admin/billing" className="font-semibold underline shrink-0">
-                Upgrade sekarang
-              </Link>
+        <div className="flex-1 overflow-y-auto scrollbar-thin bg-bg">
+          {isTrial && (
+            <div className="px-6 lg:px-8 pt-4">
+              <div className="bg-green/10 border border-green/40 text-dark text-sm rounded-sm px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                <span>
+                  Anda sedang di masa trial{trialDays !== null ? `, ${trialDays} hari tersisa` : ""}. Sebagian fitur
+                  terkunci.
+                </span>
+                <Link href="/admin/billing" className="font-semibold underline shrink-0">
+                  Upgrade sekarang
+                </Link>
+              </div>
             </div>
-          </div>
-        )}
-        {isBlocked && (
-          <div className="px-6 lg:px-8 pt-4">
-            <div className="bg-red-100 border border-red-300 text-red-800 text-sm rounded-sm px-4 py-3 flex flex-wrap items-center justify-between gap-2">
-              <span>Langganan Anda tidak aktif. Perbarui langganan untuk terus menggunakan KlinikKita.</span>
-              <Link href="/admin/billing" className="font-semibold underline shrink-0">
-                Perbarui sekarang
-              </Link>
+          )}
+          {isBlocked && (
+            <div className="px-6 lg:px-8 pt-4">
+              <div className="bg-red-100 border border-red-300 text-red-800 text-sm rounded-sm px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+                <span>Langganan Anda tidak aktif. Perbarui langganan untuk terus menggunakan KlinikKita.</span>
+                <Link href="/admin/billing" className="font-semibold underline shrink-0">
+                  Perbarui sekarang
+                </Link>
+              </div>
             </div>
-          </div>
-        )}
-        <main className="flex-1 p-6 lg:p-8 bg-bg">{children}</main>
+          )}
+          <main className="p-6 lg:p-8 bg-bg">{children}</main>
+        </div>
       </div>
     </div>
   );

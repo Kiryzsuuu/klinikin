@@ -14,10 +14,12 @@ const siteSettingsSchema = new Schema(
     faviconBase64: { type: String, default: "" },
     heroImageBase64: { type: String, default: "" },
     backgroundImageBase64: { type: String, default: "" },
+    // Gambar sisi kiri halaman login staf (/login), diatur oleh super admin.
+    loginImageBase64: { type: String, default: "" },
 
     theme: {
       primaryColor: { type: String, default: "#57D131" },
-      secondaryColor: { type: String, default: "#9EF40B" },
+      secondaryColor: { type: String, default: "#D9A441" },
       darkColor: { type: String, default: "#406661" },
       backgroundColor: { type: String, default: "#F5F5F5" },
       fontFamily: { type: String, default: "Plus Jakarta Sans" },
@@ -53,6 +55,24 @@ const siteSettingsSchema = new Schema(
       maintenanceMode: { type: Boolean, default: false },
       maintenanceMessage: { type: String, default: "Situs sedang dalam pemeliharaan." },
     },
+
+    // Konten FAQ landing page, bisa diatur bebas oleh super admin.
+    faqs: {
+      type: [
+        {
+          q: { type: String, required: true },
+          a: { type: String, required: true },
+        },
+      ],
+      default: [
+        { q: "Apakah butuh kartu kredit untuk mencoba", a: "Tidak. Trial 14 hari langsung aktif begitu klinik selesai mendaftar, tanpa perlu memasukkan data pembayaran." },
+        { q: "Bagaimana jika klinik saya punya lebih dari satu cabang", a: "KlinikKita didesain untuk multi-cabang sejak awal. Satu akun klinik bisa mengelola semua cabangnya dari satu dashboard." },
+        { q: "Apakah data klinik saya tercampur dengan klinik lain", a: "Tidak. Setiap klinik memiliki data yang terisolasi sepenuhnya, staf dan pasien klinik lain tidak akan pernah terlihat." },
+        { q: "Bagaimana cara berlangganan setelah masa trial habis", a: "Pilih paket di halaman Billing pada dashboard admin, pembayaran diproses aman melalui Midtrans." },
+      ],
+    },
+    // "accordion" = ringkas, satu pertanyaan terbuka sekaligus. "grid" = dua kolom, semua terbuka.
+    faqLayout: { type: String, enum: ["accordion", "grid"], default: "accordion" },
   },
   { timestamps: true }
 );
