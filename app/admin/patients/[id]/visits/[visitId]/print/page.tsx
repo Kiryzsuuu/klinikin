@@ -56,7 +56,7 @@ export default async function PrintVisitPage({ params }: { params: Promise<{ vis
 
       {hasMeds && (
         <section className="mb-8">
-          <h2 className="font-bold text-lg mb-3 border-b border-dark/20 pb-1">℞ Resep</h2>
+          <h2 className="font-bold text-lg mb-3 border-b border-dark/20 pb-1">Resep</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left border-b border-dark/10">

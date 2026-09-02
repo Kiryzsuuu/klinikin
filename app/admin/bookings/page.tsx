@@ -52,7 +52,7 @@ export default function BookingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-dark">Booking Pasien</h1>
-        <p className="text-dark/60">Konfirmasi booking dari Patient Portal — otomatis membuat data RME saat dikonfirmasi.</p>
+        <p className="text-dark/60">Konfirmasi booking dari Patient Portal, otomatis membuat data RME saat dikonfirmasi.</p>
       </div>
 
       <div className="space-y-3">
@@ -92,7 +92,7 @@ export default function BookingsPage() {
                 )}
                 {b.status === "CONFIRMED" && b.consultationType === "ONLINE" && b.callRoomId && (
                   <Link href={`/call/${b.callRoomId}`} className="text-green text-sm font-medium hover:underline">
-                    Mulai Panggilan Video →
+                    Mulai Panggilan Video
                   </Link>
                 )}
               </div>

@@ -136,7 +136,7 @@ export default function CallPage({ params }: { params: Promise<{ roomId: string 
     <main className="flex-1 flex items-center justify-center p-6 bg-dark">
       <Card className="w-full max-w-3xl">
         <h1 className="text-xl font-semibold text-dark mb-1">Konsultasi Online</h1>
-        <p className="text-dark/50 text-sm mb-4">Room: {roomId} — {status}</p>
+        <p className="text-dark/50 text-sm mb-4">Room: {roomId} · {status}</p>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <video ref={localVideoRef} autoPlay muted playsInline className="w-full aspect-video bg-black rounded-2xl object-cover" />

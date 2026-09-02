@@ -61,7 +61,6 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
     return (
       <main className="flex-1 flex items-center justify-center p-6">
         <Card className="w-full max-w-md text-center">
-          <div className="text-5xl mb-4">✅</div>
           <h1 className="text-xl font-semibold text-dark mb-2">Booking Diterima</h1>
           <p className="text-dark/60">Tim klinik akan segera mengonfirmasi jadwal Anda via telepon/email.</p>
         </Card>
@@ -74,7 +73,7 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
       <Card className="w-full max-w-lg">
         <h1 className="text-2xl font-semibold text-dark mb-1">Booking Konsultasi</h1>
         <p className="text-dark/60 mb-6 text-sm">
-          {clinic ? clinic.name : "Memuat..."} — tidak perlu buat akun.
+          {clinic ? clinic.name : "Memuat..."}, tidak perlu buat akun.
         </p>
 
         <form onSubmit={onSubmit} className="space-y-4">

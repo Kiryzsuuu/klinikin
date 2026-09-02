@@ -50,7 +50,7 @@ export default function Odontogram({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-dark/50">Klik tiap gigi untuk mengubah status. Legend: {STATUS_CYCLE.join(" → ")}.</p>
+      <p className="text-xs text-dark/50">Klik tiap gigi untuk mengubah status secara berurutan: {STATUS_CYCLE.join(", ")}.</p>
       <div className="grid grid-cols-8 gap-1.5">
         {chart.map((t) => (
           <button

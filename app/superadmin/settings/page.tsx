@@ -12,6 +12,7 @@ type Settings = {
   logoBase64: string;
   faviconBase64: string;
   heroImageBase64: string;
+  backgroundImageBase64: string;
   theme: {
     primaryColor: string;
     secondaryColor: string;
@@ -50,7 +51,10 @@ export default function SettingsPage() {
     setSettings((s) => (s ? { ...s, [key]: { ...(s[key] as object), ...patch } } : s));
   }
 
-  async function onImageChange(field: "logoBase64" | "faviconBase64" | "heroImageBase64", file: File | undefined) {
+  async function onImageChange(
+    field: "logoBase64" | "faviconBase64" | "heroImageBase64" | "backgroundImageBase64",
+    file: File | undefined
+  ) {
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
       setError("Ukuran gambar maksimal 2MB");
@@ -122,6 +126,16 @@ export default function SettingsPage() {
             <ImagePicker label="Favicon" value={settings.faviconBase64} onChange={(f) => onImageChange("faviconBase64", f)} />
             <ImagePicker label="Gambar Hero" value={settings.heroImageBase64} onChange={(f) => onImageChange("heroImageBase64", f)} />
           </div>
+          <div className="grid sm:grid-cols-3 gap-4 mt-4">
+            <ImagePicker
+              label="Gambar Latar Belakang"
+              value={settings.backgroundImageBase64}
+              onChange={(f) => onImageChange("backgroundImageBase64", f)}
+            />
+          </div>
+          <p className="text-xs text-dark/40 mt-2">
+            Gambar latar belakang ditampilkan penuh di belakang halaman utama, di bawah lapisan warna tema.
+          </p>
         </Card>
 
         <Card>

@@ -104,7 +104,7 @@ export default function SecurityPage() {
       <Card>
         {me.mfaEnabled ? (
           <>
-            <p className="text-green font-medium mb-1">✅ MFA Aktif</p>
+            <p className="text-green font-medium mb-1">MFA Aktif</p>
             <p className="text-sm text-dark/60 mb-4">Masukkan kode dari authenticator untuk menonaktifkan.</p>
             <form onSubmit={disable} className="space-y-3">
               <Input

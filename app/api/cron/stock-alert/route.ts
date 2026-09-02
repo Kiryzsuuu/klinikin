@@ -28,9 +28,9 @@ export async function GET(req: NextRequest) {
   const recipients = await User.find({ role: { $in: ["OWNER", "ADMIN_PUSAT"] }, isActive: true }).select("email name");
 
   const html = `
-    <h2>Alert Stok Obat — KlinikKita</h2>
-    ${lowStock.length > 0 ? `<h3>Stok Kritis (${lowStock.length})</h3><ul>${lowStock.map((m) => `<li>${m.name} — ${m.branchId?.name}: ${m.stock.current} ${m.unit} (min. ${m.stock.minimum})</li>`).join("")}</ul>` : ""}
-    ${expiringSoon.length > 0 ? `<h3>Mendekati Kadaluarsa (${expiringSoon.length})</h3><ul>${expiringSoon.map((m) => `<li>${m.name} — ${m.branchId?.name}</li>`).join("")}</ul>` : ""}
+    <h2>Alert Stok Obat KlinikKita</h2>
+    ${lowStock.length > 0 ? `<h3>Stok Kritis (${lowStock.length})</h3><ul>${lowStock.map((m) => `<li>${m.name}, ${m.branchId?.name}: ${m.stock.current} ${m.unit} (min. ${m.stock.minimum})</li>`).join("")}</ul>` : ""}
+    ${expiringSoon.length > 0 ? `<h3>Mendekati Kadaluarsa (${expiringSoon.length})</h3><ul>${expiringSoon.map((m) => `<li>${m.name}, ${m.branchId?.name}</li>`).join("")}</ul>` : ""}
   `;
 
   for (const r of recipients) {

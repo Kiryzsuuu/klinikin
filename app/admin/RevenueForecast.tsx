@@ -22,7 +22,7 @@ export default function RevenueForecast() {
   return (
     <Card>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-semibold text-dark">✨ AI Revenue Forecast</h2>
+        <h2 className="font-semibold text-dark">AI Revenue Forecast</h2>
         <Button variant="secondary" onClick={run} disabled={loading} className="!px-3 !py-1.5 text-sm">
           {loading ? "Menganalisis..." : "Buat Analisis"}
         </Button>

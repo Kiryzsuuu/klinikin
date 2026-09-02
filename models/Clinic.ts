@@ -22,6 +22,7 @@ const clinicSchema = new Schema(
       tagline: { type: String, default: "Klinik kepercayaan keluarga Anda" },
       description: { type: String, default: "" },
       heroImageBase64: { type: String, default: "" },
+      backgroundImageBase64: { type: String, default: "" },
       theme: {
         primaryColor: { type: String, default: "#57D131" },
         secondaryColor: { type: String, default: "#B9E937" },

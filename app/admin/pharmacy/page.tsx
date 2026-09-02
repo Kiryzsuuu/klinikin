@@ -151,7 +151,7 @@ export default function PharmacyPage() {
         setPrediction({
           id: m._id,
           text: `Perkiraan kebutuhan 30 hari: ${p.predictedNeed30Days} ${m.unit} (terjual ${p.totalSold30Days} bulan lalu). ${
-            p.reorderRecommended ? "⚠️ Disarankan reorder sekarang." : "Stok masih aman."
+            p.reorderRecommended ? "Disarankan reorder sekarang." : "Stok masih aman."
           } ${p.reasoning}`,
         });
       } else {
@@ -216,7 +216,7 @@ export default function PharmacyPage() {
                     <td className="py-3 pr-4 text-dark/70">Rp {m.pricing.sellPrice.toLocaleString("id-ID")}</td>
                     <td className="py-3 pr-4 text-right space-x-3">
                       <button onClick={() => predictStock(m)} disabled={predicting === m._id} className="text-dark/60 font-medium hover:text-green cursor-pointer disabled:opacity-50">
-                        {predicting === m._id ? "..." : "✨ Prediksi"}
+                        {predicting === m._id ? "..." : "Prediksi"}
                       </button>
                       <button onClick={() => setShowBatch(m)} className="text-dark/60 font-medium hover:text-green cursor-pointer">
                         + Batch
@@ -293,7 +293,7 @@ export default function PharmacyPage() {
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <Card className="w-full max-w-md">
             <h2 className="text-xl font-semibold text-dark mb-1">Transfer Stok</h2>
-            <p className="text-dark/60 text-sm mb-4">{showTransfer.name} — stok saat ini {showTransfer.stock.current} {showTransfer.unit}</p>
+            <p className="text-dark/60 text-sm mb-4">{showTransfer.name}, stok saat ini {showTransfer.stock.current} {showTransfer.unit}</p>
             <form onSubmit={doTransfer} className="space-y-4">
               <div>
                 <Label>Cabang Tujuan</Label>

@@ -212,7 +212,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
         </div>
         <div className="flex gap-2">
           <Button variant="ghost" onClick={getSummary} disabled={summaryLoading}>
-            {summaryLoading ? "Meringkas..." : "✨ AI Ringkasan Riwayat"}
+            {summaryLoading ? "Meringkas..." : "AI Ringkasan Riwayat"}
           </Button>
           <Button onClick={() => setShowNewVisit(true)}>+ Kunjungan Baru</Button>
         </div>
@@ -220,7 +220,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
 
       {summary && (
         <Card className="bg-lime/10 border-lime/40">
-          <p className="text-sm font-medium text-dark mb-1">✨ Ringkasan AI</p>
+          <p className="text-sm font-medium text-dark mb-1">Ringkasan AI</p>
           <p className="text-sm text-dark/80">{summary}</p>
         </Card>
       )}
@@ -262,7 +262,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
               target="_blank"
               className="inline-block px-3 py-1.5 text-xs rounded-2xl border border-dark/20 text-dark/70 hover:bg-dark/5 mb-2"
             >
-              🖨️ Cetak Resep/Rujukan
+              Cetak Resep/Rujukan
             </Link>
 
             {v.status !== "DONE" && (
@@ -283,7 +283,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
 
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant="secondary" onClick={() => getSuggestions(v._id)} disabled={aiLoading}>
-                    {aiLoading && activeVisit === v._id ? "Menganalisis..." : "✨ AI Saran Diagnosis ICD-10"}
+                    {aiLoading && activeVisit === v._id ? "Menganalisis..." : "AI Saran Diagnosis ICD-10"}
                   </Button>
                   <Button
                     type="button"
@@ -291,7 +291,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                     onClick={() => setOpenChart(openChart?.visitId === v._id && openChart.type === "dental" ? null : { visitId: v._id, type: "dental" })}
                     className="!px-3 !py-1.5 text-xs"
                   >
-                    🦷 Odontogram
+                    Odontogram
                   </Button>
                   <Button
                     type="button"
@@ -299,7 +299,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                     onClick={() => setOpenChart(openChart?.visitId === v._id && openChart.type === "skin" ? null : { visitId: v._id, type: "skin" })}
                     className="!px-3 !py-1.5 text-xs"
                   >
-                    ✨ Skin Chart
+                    Skin Chart
                   </Button>
                   <Button
                     type="button"
@@ -307,10 +307,10 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                     onClick={() => setOpenRx(openRx === v._id ? null : v._id)}
                     className="!px-3 !py-1.5 text-xs"
                   >
-                    ℞ Resep & Rujukan
+                    Resep & Rujukan
                   </Button>
                   <label className="px-3 py-1.5 text-xs rounded-2xl border border-dark/20 text-dark/70 hover:bg-dark/5 cursor-pointer">
-                    📎 Lampirkan Foto/Dokumen
+                    Lampirkan Foto/Dokumen
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => addAttachment(v, e.target.files?.[0])} />
                   </label>
                 </div>
@@ -337,7 +337,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
 
                 {activeVisit === v._id && suggestions.length > 0 && (
                   <div className="space-y-2 bg-bg rounded-2xl p-4">
-                    <p className="text-xs text-dark/50">Saran AI — bukan diagnosis final, dokter tetap yang memutuskan.</p>
+                    <p className="text-xs text-dark/50">Saran AI, bukan diagnosis final. Dokter tetap yang memutuskan.</p>
                     {suggestions.map((s, i) => (
                       <div key={i} className="flex items-center justify-between gap-3 bg-white rounded-xl p-3">
                         <div>

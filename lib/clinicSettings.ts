@@ -17,6 +17,7 @@ export const clinicSettingsSchema = z.object({
       tagline: z.string().optional(),
       description: z.string().optional(),
       heroImageBase64: z.string().optional(),
+      backgroundImageBase64: z.string().optional(),
       theme: z
         .object({
           primaryColor: z.string().optional(),
@@ -51,6 +52,9 @@ export function validateClinicImages(data: ClinicSettingsInput): string | null {
   if (data.logoBase64 && !isValidBase64Image(data.logoBase64)) return "Logo tidak valid atau > 2MB";
   if (data.settings?.heroImageBase64 && !isValidBase64Image(data.settings.heroImageBase64)) {
     return "Gambar hero tidak valid atau > 2MB";
+  }
+  if (data.settings?.backgroundImageBase64 && !isValidBase64Image(data.settings.backgroundImageBase64)) {
+    return "Gambar latar tidak valid atau > 2MB";
   }
   for (const item of data.settings?.gallery ?? []) {
     if (!isValidBase64Image(item.imageBase64)) return "Salah satu foto galeri tidak valid atau > 2MB";

@@ -5,11 +5,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 
 const NAV = [
-  { href: "/superadmin", label: "Dashboard", icon: "🏠" },
-  { href: "/superadmin/clinics", label: "Klinik", icon: "🏥" },
-  { href: "/superadmin/plans", label: "Paket Langganan", icon: "📦" },
-  { href: "/superadmin/payments", label: "Pembayaran", icon: "💳" },
-  { href: "/superadmin/settings", label: "Site Settings", icon: "⚙️" },
+  { href: "/superadmin", label: "Dashboard" },
+  { href: "/superadmin/clinics", label: "Klinik" },
+  { href: "/superadmin/plans", label: "Paket Langganan" },
+  { href: "/superadmin/payments", label: "Pembayaran" },
+  { href: "/superadmin/settings", label: "Site Settings" },
 ];
 
 export default function SuperAdminShell({
@@ -49,11 +49,12 @@ export default function SuperAdminShell({
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition ${
-                  active ? "bg-green text-white" : "text-white/70 hover:bg-white/10"
+                className={`flex items-center px-4 py-2.5 rounded-xl border-l-2 transition ${
+                  active
+                    ? "bg-green text-white border-lime"
+                    : "text-white/70 border-transparent hover:bg-white/10 hover:text-white"
                 }`}
               >
-                <span>{item.icon}</span>
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             );
@@ -85,8 +86,8 @@ export default function SuperAdminShell({
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-dark/10">
           <p className="font-semibold text-dark">KlinikKita · Super Admin</p>
-          <button onClick={() => setOpen(true)} className="text-dark cursor-pointer">
-            ☰
+          <button onClick={() => setOpen(true)} className="text-dark text-sm font-medium cursor-pointer">
+            Menu
           </button>
         </header>
         <main className="flex-1 p-6 lg:p-8 bg-bg">{children}</main>

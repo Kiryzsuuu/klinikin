@@ -98,10 +98,10 @@ export default function BillingPage() {
             <p className="text-2xl font-semibold text-green mb-3">
               Rp {p.priceMonthly.toLocaleString("id-ID")}<span className="text-sm text-dark/50">/bulan</span>
             </p>
-            <ul className="text-sm text-dark/70 space-y-1 mb-4">
-              <li>Maks {p.maxBranches} cabang</li>
-              <li>Maks {p.maxUsers} pengguna</li>
-              {p.features.map((f) => <li key={f}>✓ {f}</li>)}
+            <ul className="text-sm text-dark/70 space-y-2 mb-4">
+              <li className="pl-3 border-l-2 border-green">Maks {p.maxBranches} cabang</li>
+              <li className="pl-3 border-l-2 border-green">Maks {p.maxUsers} pengguna</li>
+              {p.features.map((f) => <li key={f} className="pl-3 border-l-2 border-green">{f}</li>)}
             </ul>
             <Button className="w-full" disabled={payingId === p._id} onClick={() => subscribe(p._id)}>
               {payingId === p._id ? "Memproses..." : "Berlangganan"}

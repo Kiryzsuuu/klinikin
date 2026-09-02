@@ -108,7 +108,7 @@ export default function ProcurementPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold text-dark">Procurement Obat</h1>
-        <p className="text-dark/60">Pencatatan pengadaan internal — supplier & purchase order manual, bukan marketplace pihak ketiga.</p>
+        <p className="text-dark/60">Pencatatan pengadaan internal, supplier dan purchase order manual, bukan marketplace pihak ketiga.</p>
       </div>
 
       <Card>

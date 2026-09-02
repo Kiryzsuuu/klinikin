@@ -14,7 +14,7 @@ export default function ChatPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-semibold text-dark">✨ Asisten AI</h1>
+        <h1 className="text-2xl font-semibold text-dark">Asisten AI</h1>
         <p className="text-dark/60">Tanya seputar SOP, istilah medis, atau kode ICD-10. Bukan pengganti keputusan klinis dokter.</p>
       </div>
 

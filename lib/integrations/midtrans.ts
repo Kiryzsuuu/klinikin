@@ -43,7 +43,7 @@ export async function createSnapTransaction(clinic: ClinicLike, plan: PlanLike, 
         id: String(plan._id),
         price: plan.priceMonthly,
         quantity: 1,
-        name: `Langganan KlinikKita — Paket ${plan.name} (1 bulan)`,
+        name: `Langganan KlinikKita, Paket ${plan.name} (1 bulan)`,
       },
     ],
     customer_details: {

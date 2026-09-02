@@ -15,6 +15,7 @@ type ClinicSettings = {
     tagline: string;
     description: string;
     heroImageBase64: string;
+    backgroundImageBase64: string;
     theme: { primaryColor: string; secondaryColor: string; darkColor: string };
     hero: { title: string; subtitle: string; ctaText: string };
     socials: { instagram: string; facebook: string; tiktok: string; whatsapp: string };
@@ -141,6 +142,16 @@ export default function ClinicSettingsForm({
             onChange={(f) => onImage(f, (b) => updateSettings({ heroImageBase64: b }))}
           />
         </div>
+        <div className="grid sm:grid-cols-2 gap-4 mt-4">
+          <ImagePicker
+            label="Gambar Latar Belakang"
+            value={clinic.settings.backgroundImageBase64}
+            onChange={(f) => onImage(f, (b) => updateSettings({ backgroundImageBase64: b }))}
+          />
+        </div>
+        <p className="text-xs text-dark/40 mt-2">
+          Gambar latar belakang ditampilkan penuh di belakang halaman publik klinik Anda.
+        </p>
       </Card>
 
       <Card>
@@ -172,7 +183,7 @@ export default function ClinicSettingsForm({
 
       <Card>
         <h2 className="font-semibold text-dark mb-4">Foto Promo / Event</h2>
-        <p className="text-sm text-dark/50 mb-4">Tampil di halaman publik klinik — cocok untuk info vaksinasi gratis, event kesehatan, promo baru, dll.</p>
+        <p className="text-sm text-dark/50 mb-4">Tampil di halaman publik klinik, cocok untuk info vaksinasi gratis, event kesehatan, promo baru, dan sejenisnya.</p>
         <div className="space-y-3 mb-4">
           {clinic.settings.gallery.map((item, i) => (
             <div key={i} className="flex items-center gap-3">

@@ -18,6 +18,7 @@ const settingsSchema = z.object({
   logoBase64: z.string().optional(),
   faviconBase64: z.string().optional(),
   heroImageBase64: z.string().optional(),
+  backgroundImageBase64: z.string().optional(),
   theme: z
     .object({
       primaryColor: z.string().optional(),
@@ -77,7 +78,7 @@ export async function PUT(req: NextRequest) {
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
 
   const data = parsed.data;
-  for (const key of ["logoBase64", "faviconBase64", "heroImageBase64"] as const) {
+  for (const key of ["logoBase64", "faviconBase64", "heroImageBase64", "backgroundImageBase64"] as const) {
     const value = data[key];
     if (value && !isValidBase64Image(value)) {
       return fail("INVALID_IMAGE", `Gambar untuk ${key} tidak valid atau > 2MB`, 422);

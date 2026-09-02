@@ -65,7 +65,7 @@ export default function PortalDashboardPage({ params }: { params: Promise<{ slug
 
       {patient.allergies && patient.allergies.length > 0 && (
         <Card className="bg-red-50 border-red-100">
-          <p className="text-sm font-medium text-red-600">⚠️ Alergi tercatat: {patient.allergies.join(", ")}</p>
+          <p className="text-sm font-medium text-red-600">Alergi tercatat: {patient.allergies.join(", ")}</p>
         </Card>
       )}
 

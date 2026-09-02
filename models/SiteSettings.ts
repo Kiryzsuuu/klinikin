@@ -13,13 +13,14 @@ const siteSettingsSchema = new Schema(
     logoBase64: { type: String, default: "" },
     faviconBase64: { type: String, default: "" },
     heroImageBase64: { type: String, default: "" },
+    backgroundImageBase64: { type: String, default: "" },
 
     theme: {
       primaryColor: { type: String, default: "#57D131" },
       secondaryColor: { type: String, default: "#B9E937" },
       darkColor: { type: String, default: "#406661" },
       backgroundColor: { type: String, default: "#F5F5F5" },
-      fontFamily: { type: String, default: "Fredoka One" },
+      fontFamily: { type: String, default: "Plus Jakarta Sans" },
       borderRadius: { type: String, default: "1rem" },
     },
 
@@ -41,7 +42,7 @@ const siteSettingsSchema = new Schema(
       title: { type: String, default: "Satu Platform untuk Mengelola Klinik Anda" },
       subtitle: {
         type: String,
-        default: "RME, farmasi, keuangan, booking online, hingga SDM — semua terintegrasi. Coba gratis 14 hari, tanpa kartu kredit.",
+        default: "RME, farmasi, keuangan, booking online, hingga SDM, semua terintegrasi dalam satu platform. Coba gratis 14 hari, tanpa kartu kredit.",
       },
       ctaText: { type: String, default: "Coba Gratis 14 Hari" },
       ctaLink: { type: String, default: "/register" },

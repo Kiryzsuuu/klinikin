@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const recipients = await User.find({ role: { $in: ["OWNER", "ADMIN_PUSAT"] }, isActive: true }).select("email name");
 
   const html = `
-    <h2>Laporan Harian — KlinikKita</h2>
+    <h2>Laporan Harian KlinikKita</h2>
     <p>${startOfDay.toLocaleDateString("id-ID")}</p>
     <ul>
       <li>Total kunjungan: ${visitCount}</li>

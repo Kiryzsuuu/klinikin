@@ -126,7 +126,7 @@ export default async function AdminDashboard() {
       </div>
 
       <Card>
-        <h2 className="font-semibold text-dark mb-4">KPI Dokter — Kunjungan Bulan Ini</h2>
+        <h2 className="font-semibold text-dark mb-4">KPI Dokter · Kunjungan Bulan Ini</h2>
         <div className="space-y-2">
           {kpiByDoctor.length === 0 && <p className="text-dark/40 text-sm">Belum ada data kunjungan bulan ini</p>}
           {kpiByDoctor.map((k: { _id: string; totalVisits: number; done: number; doctor: { name: string } }) => (

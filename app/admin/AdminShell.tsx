@@ -26,24 +26,24 @@ const TRIAL_LOCKED_HREFS = new Set([
 ]);
 
 const NAV = [
-  { href: "/admin", label: "Dashboard", icon: "🏠" },
-  { href: "/admin/branches", label: "Manajemen Cabang", icon: "🏢" },
-  { href: "/admin/patients", label: "Data Pasien / RME", icon: "🩺" },
-  { href: "/admin/pharmacy", label: "Farmasi & Stok", icon: "💊" },
-  { href: "/admin/cashier", label: "Kasir & Invoice", icon: "🧾" },
-  { href: "/admin/bookings", label: "Booking Pasien", icon: "📅" },
-  { href: "/admin/lab", label: "Lab & Radiologi", icon: "🧪" },
-  { href: "/admin/insurance", label: "Asuransi Swasta", icon: "🛡️" },
-  { href: "/admin/procurement", label: "Procurement Obat", icon: "📦" },
-  { href: "/admin/hr", label: "SDM & Jadwal", icon: "🗓️" },
-  { href: "/admin/accreditation", label: "Akreditasi", icon: "📋" },
-  { href: "/admin/chat", label: "Asisten AI", icon: "✨" },
-  { href: "/admin/users", label: "Manajemen User", icon: "👥" },
-  { href: "/admin/api-keys", label: "API Publik", icon: "🔑" },
-  { href: "/admin/audit-log", label: "Audit Log", icon: "📜" },
-  { href: "/admin/security", label: "Keamanan (MFA)", icon: "🔐" },
-  { href: "/admin/billing", label: "Langganan & Billing", icon: "💳" },
-  { href: "/admin/settings", label: "Site Settings", icon: "⚙️" },
+  { href: "/admin", label: "Dashboard" },
+  { href: "/admin/branches", label: "Manajemen Cabang" },
+  { href: "/admin/patients", label: "Data Pasien / RME" },
+  { href: "/admin/pharmacy", label: "Farmasi & Stok" },
+  { href: "/admin/cashier", label: "Kasir & Invoice" },
+  { href: "/admin/bookings", label: "Booking Pasien" },
+  { href: "/admin/lab", label: "Lab & Radiologi" },
+  { href: "/admin/insurance", label: "Asuransi Swasta" },
+  { href: "/admin/procurement", label: "Procurement Obat" },
+  { href: "/admin/hr", label: "SDM & Jadwal" },
+  { href: "/admin/accreditation", label: "Akreditasi" },
+  { href: "/admin/chat", label: "Asisten AI" },
+  { href: "/admin/users", label: "Manajemen User" },
+  { href: "/admin/api-keys", label: "API Publik" },
+  { href: "/admin/audit-log", label: "Audit Log" },
+  { href: "/admin/security", label: "Keamanan (MFA)" },
+  { href: "/admin/billing", label: "Langganan & Billing" },
+  { href: "/admin/settings", label: "Site Settings" },
 ];
 
 function daysLeft(dateStr: string | null) {
@@ -87,7 +87,7 @@ export default function AdminShell({
           <p className="text-xs text-white/50 truncate">{clinic?.name || "Admin Panel"}</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto scrollbar-thin">
           {NAV.map((item) => {
             const active = pathname === item.href;
             const locked = isTrial && TRIAL_LOCKED_HREFS.has(item.href);
@@ -96,14 +96,19 @@ export default function AdminShell({
                 key={item.href}
                 href={locked ? "/admin/billing" : item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition ${
-                  active ? "bg-green text-white" : "text-white/70 hover:bg-white/10"
+                className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border-l-2 transition ${
+                  active
+                    ? "bg-green text-white border-lime"
+                    : "text-white/70 border-transparent hover:bg-white/10 hover:text-white"
                 } ${locked ? "opacity-50" : ""}`}
-                title={locked ? "Terkunci selama trial — upgrade untuk membuka" : undefined}
+                title={locked ? "Terkunci selama trial, upgrade untuk membuka" : undefined}
               >
-                <span>{item.icon}</span>
-                {locked && <span className="text-xs">🔒</span>}
                 <span className="text-sm font-medium">{item.label}</span>
+                {locked && (
+                  <span className="text-[10px] uppercase tracking-wide bg-white/10 px-1.5 py-0.5 rounded-md shrink-0">
+                    Terkunci
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -151,19 +156,19 @@ export default function AdminShell({
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-dark/10">
           <p className="font-semibold text-dark">KlinikKita</p>
-          <button onClick={() => setOpen(true)} className="text-dark cursor-pointer">
-            ☰
+          <button onClick={() => setOpen(true)} className="text-dark text-sm font-medium cursor-pointer">
+            Menu
           </button>
         </header>
         {isTrial && (
           <div className="px-6 lg:px-8 pt-4">
             <div className="bg-lime/30 border border-lime text-dark text-sm rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
               <span>
-                Anda sedang di masa trial{trialDays !== null ? ` — ${trialDays} hari tersisa` : ""}. Sebagian fitur
-                terkunci (ditandai 🔒).
+                Anda sedang di masa trial{trialDays !== null ? `, ${trialDays} hari tersisa` : ""}. Sebagian fitur
+                terkunci.
               </span>
               <Link href="/admin/billing" className="font-semibold underline shrink-0">
-                Upgrade sekarang →
+                Upgrade sekarang
               </Link>
             </div>
           </div>
@@ -173,7 +178,7 @@ export default function AdminShell({
             <div className="bg-red-100 border border-red-300 text-red-800 text-sm rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
               <span>Langganan Anda tidak aktif. Perbarui langganan untuk terus menggunakan KlinikKita.</span>
               <Link href="/admin/billing" className="font-semibold underline shrink-0">
-                Perbarui sekarang →
+                Perbarui sekarang
               </Link>
             </div>
           </div>

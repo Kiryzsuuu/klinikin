@@ -70,7 +70,7 @@ export default function ClinicDetailPage({ params }: { params: Promise<{ id: str
           <p className="text-dark/60">{clinic.slug} · {clinic.ownerEmail}</p>
         </div>
         <Link href={`/superadmin/clinics/${clinic._id}/settings`}>
-          <Button variant="secondary">⚙️ Site Settings Klinik</Button>
+          <Button variant="secondary">Site Settings Klinik</Button>
         </Link>
       </div>
 

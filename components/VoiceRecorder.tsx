@@ -63,7 +63,7 @@ export default function VoiceRecorder({ onTranscript }: { onTranscript: (text: s
         disabled={transcribing}
         className="!px-3 !py-1.5 text-xs"
       >
-        {transcribing ? "Mentranskrip..." : recording ? "⏹ Berhenti Rekam" : "🎤 Rekam Suara"}
+        {transcribing ? "Mentranskrip..." : recording ? "Berhenti Rekam" : "Rekam Suara"}
       </Button>
       {error && <p className="text-red-500 text-xs">{error}</p>}
     </div>

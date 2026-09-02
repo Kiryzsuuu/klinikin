@@ -87,7 +87,7 @@ export default function HrPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-dark">SDM — Jadwal Praktik</h1>
+          <h1 className="text-2xl font-semibold text-dark">SDM · Jadwal Praktik</h1>
           <p className="text-dark/60">Atur jadwal shift staf lintas cabang.</p>
         </div>
         <Button onClick={() => setShowForm(true)}>+ Tambah Jadwal</Button>
