@@ -34,7 +34,7 @@ export function otpEmailTemplate(name: string, code: string, minutes: number) {
     <h2 style="color: #406661; margin-bottom: 4px;">KlinikKita</h2>
     <p style="color: #333;">Halo ${name},</p>
     <p style="color: #333;">Gunakan kode OTP berikut untuk melanjutkan proses verifikasi Anda:</p>
-    <div style="background: #B9E937; color: #406661; font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 16px; border-radius: 12px; margin: 24px 0;">
+    <div style="background: #1B686B; color: #FFFFFF; font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 16px; border-radius: 12px; margin: 24px 0;">
       ${code}
     </div>
     <p style="color: #666; font-size: 14px;">Kode ini berlaku selama ${minutes} menit. Jangan bagikan kode ini kepada siapa pun.</p>

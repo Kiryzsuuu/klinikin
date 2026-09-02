@@ -3,8 +3,8 @@
 :root {
   /* Palette: https://colorhunt.co/palette/f5f5f5b9e93757d131406661 */
   --color-bg: #f5f5f5;
-  --color-lime: #d9a441;
-  --color-green: #57d131;
+  --color-lime: #1b686b;
+  --color-green: #1b686b;
   --color-dark: #406661;
 
   --background: var(--color-bg);

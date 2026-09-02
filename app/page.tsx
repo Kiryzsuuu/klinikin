@@ -70,8 +70,8 @@ export default async function Home() {
       className="flex-1"
       style={
         {
-          "--color-green": theme.primaryColor || "#57D131",
-          "--color-lime": theme.secondaryColor || "#D9A441",
+          "--color-green": theme.primaryColor || "#1B686B",
+          "--color-lime": theme.secondaryColor || "#1B686B",
           "--color-dark": theme.darkColor || "#406661",
         } as CSSProperties
       }

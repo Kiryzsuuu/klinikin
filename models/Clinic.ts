@@ -26,8 +26,8 @@ const clinicSchema = new Schema(
       // Gambar sisi kiri halaman login portal pasien (/c/[slug]/portal/login).
       loginImageBase64: { type: String, default: "" },
       theme: {
-        primaryColor: { type: String, default: "#57D131" },
-        secondaryColor: { type: String, default: "#D9A441" },
+        primaryColor: { type: String, default: "#1B686B" },
+        secondaryColor: { type: String, default: "#1B686B" },
         darkColor: { type: String, default: "#406661" },
       },
       hero: {

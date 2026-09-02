@@ -18,8 +18,8 @@ const siteSettingsSchema = new Schema(
     loginImageBase64: { type: String, default: "" },
 
     theme: {
-      primaryColor: { type: String, default: "#57D131" },
-      secondaryColor: { type: String, default: "#D9A441" },
+      primaryColor: { type: String, default: "#1B686B" },
+      secondaryColor: { type: String, default: "#1B686B" },
       darkColor: { type: String, default: "#406661" },
       backgroundColor: { type: String, default: "#F5F5F5" },
       fontFamily: { type: String, default: "Plus Jakarta Sans" },

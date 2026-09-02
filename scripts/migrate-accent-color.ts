@@ -4,26 +4,31 @@ import { connectDB } from "../lib/db";
 import { SiteSettings } from "../models/SiteSettings";
 import { Clinic } from "../models/Clinic";
 
-const OLD_LIME = ["#9EF40B", "#B9E937"];
-const NEW_ACCENT = "#D9A441";
+const OLD_COLORS = ["#9EF40B", "#B9E937", "#D9A441", "#57D131"];
+const NEW_ACCENT = "#1B686B";
 
-// Ganti warna aksen "lime" neon lama jadi amber di data yang sudah tersimpan.
-// Hanya menimpa dokumen yang masih pakai default lama, tidak menimpa warna
-// yang sudah sengaja dikustomisasi admin ke warna lain.
+// Ganti semua warna aksen lama (lime neon, amber, green lama) jadi satu warna
+// tunggal #1B686B di data yang sudah tersimpan. Hanya menimpa dokumen yang
+// masih pakai salah satu default lama, tidak menimpa warna yang sudah sengaja
+// dikustomisasi admin ke warna lain.
 async function main() {
   await connectDB();
 
-  const siteRes = await SiteSettings.updateMany(
-    { "theme.secondaryColor": { $in: OLD_LIME } },
-    { $set: { "theme.secondaryColor": NEW_ACCENT } }
-  );
-  console.log(`SiteSettings diperbarui: ${siteRes.modifiedCount}`);
+  for (const field of ["theme.primaryColor", "theme.secondaryColor"]) {
+    const siteRes = await SiteSettings.updateMany(
+      { [field]: { $in: OLD_COLORS } },
+      { $set: { [field]: NEW_ACCENT } }
+    );
+    console.log(`SiteSettings.${field} diperbarui: ${siteRes.modifiedCount}`);
+  }
 
-  const clinicRes = await Clinic.updateMany(
-    { "settings.theme.secondaryColor": { $in: OLD_LIME } },
-    { $set: { "settings.theme.secondaryColor": NEW_ACCENT } }
-  );
-  console.log(`Clinic diperbarui: ${clinicRes.modifiedCount}`);
+  for (const field of ["settings.theme.primaryColor", "settings.theme.secondaryColor"]) {
+    const clinicRes = await Clinic.updateMany(
+      { [field]: { $in: OLD_COLORS } },
+      { $set: { [field]: NEW_ACCENT } }
+    );
+    console.log(`Clinic.${field} diperbarui: ${clinicRes.modifiedCount}`);
+  }
 
   process.exit(0);
 }

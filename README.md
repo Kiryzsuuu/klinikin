@@ -10,7 +10,7 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
 - Manajemen User staf (CRUD penuh, role, foto)
 - Site Settings fully customizable (branding, tema warna, font, kontak, sosial media, maintenance mode)
 - Semua gambar disimpan sebagai base64 langsung di MongoDB (maks 2MB/gambar)
-- Palet warna `#F5F5F5 / #B9E937 / #57D131 / #406661` + font **Fredoka**
+- Palet warna `#F5F5F5 / #1B686B / #406661` + font **Fredoka**
 - API publik untuk pihak ketiga (`/api/public/v1/*`, auth via API key, kelola di `/admin/api-keys`)
 
 **Operasional Klinik**
