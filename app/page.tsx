@@ -207,11 +207,11 @@ export default async function Home() {
         <SectionTitle eyebrow="Harga" title="Harga yang Jelas, Tanpa Kejutan" subtitle="Coba gratis 14 hari, tanpa kartu kredit. Upgrade kapan saja." />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map((p, i) => (
-            <div key={String(p._id)} className="bg-white shadow-[0px_0px_4px_rgba(0,0,0,0.15)] text-center relative overflow-hidden">
+            <div key={String(p._id)} className="bg-white shadow-[0px_0px_4px_rgba(0,0,0,0.15)] text-center relative overflow-hidden flex flex-col h-full">
               <h3 className={`py-5 text-sm font-semibold uppercase tracking-wide ${i === 1 ? "bg-green text-white" : "bg-dark/5 text-dark/60"}`}>
                 {p.name}
               </h3>
-              <div className="px-6 pt-6">
+              <div className="px-6 pt-6 flex-1">
                 <p className="text-4xl font-bold text-dark">
                   Rp {p.priceMonthly.toLocaleString("id-ID")}
                   <span className="block text-sm font-normal text-dark/40 mt-1">per bulan</span>
@@ -233,7 +233,7 @@ export default async function Home() {
                   ))}
                 </ul>
               </div>
-              <div className="bg-dark/5 py-5">
+              <div className="bg-dark/5 py-5 mt-auto">
                 <Link href="/register" className="inline-block px-9 py-2.5 bg-green text-white rounded-md text-sm font-semibold hover:brightness-95">
                   Coba Gratis
                 </Link>
