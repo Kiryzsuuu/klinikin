@@ -104,7 +104,7 @@ export default function AdminShell({
         }`}
       >
         <div className="p-6 border-b border-white/10">
-          <p className="text-xl font-semibold text-lime">KlinikKita</p>
+          <p className="text-xl font-semibold text-white">KlinikKita</p>
           <p className="text-xs text-white/50 truncate">{clinic?.name || "Admin Panel"}</p>
         </div>
 
@@ -150,7 +150,7 @@ export default function AdminShell({
                 unoptimized
               />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-lime text-dark flex items-center justify-center font-semibold">
+              <div className="w-9 h-9 rounded-full bg-lime text-white flex items-center justify-center font-semibold">
                 {user.name.charAt(0).toUpperCase()}
               </div>
             )}

@@ -9,7 +9,7 @@ export function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "ghost" | "danger" }) {
   const styles: Record<string, string> = {
     primary: "bg-green text-white hover:brightness-95 shadow-md shadow-green/30",
-    secondary: "bg-lime text-dark hover:brightness-95 shadow-md shadow-lime/30",
+    secondary: "bg-lime text-white hover:brightness-95 shadow-md shadow-lime/30",
     ghost: "bg-transparent text-dark border border-dark/20 hover:bg-dark/5",
     danger: "bg-red-500 text-white hover:bg-red-600",
   };

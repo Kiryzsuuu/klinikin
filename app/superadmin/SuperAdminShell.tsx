@@ -38,7 +38,7 @@ export default function SuperAdminShell({
         }`}
       >
         <div className="p-6 border-b border-white/10">
-          <p className="text-xl font-semibold text-lime">KlinikKita</p>
+          <p className="text-xl font-semibold text-white">KlinikKita</p>
           <p className="text-xs text-white/50">Super Admin</p>
         </div>
 

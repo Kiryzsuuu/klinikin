@@ -94,7 +94,7 @@ export default async function AdminDashboard() {
 
       <Card className="bg-dark text-white">
         <p className="text-sm text-white/60">Pendapatan Bulan Ini (invoice lunas)</p>
-        <p className="text-3xl font-semibold text-lime mt-1">Rp {revenueThisMonth.toLocaleString("id-ID")}</p>
+        <p className="text-3xl font-semibold text-white mt-1">Rp {revenueThisMonth.toLocaleString("id-ID")}</p>
       </Card>
 
       <RevenueForecast />

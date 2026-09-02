@@ -50,7 +50,7 @@ export default async function SuperAdminDashboard() {
 
       <Card className="bg-dark text-white">
         <p className="text-sm text-white/60">Estimasi MRR (klinik status ACTIVE)</p>
-        <p className="text-3xl font-semibold text-lime mt-1">Rp {mrr.toLocaleString("id-ID")}</p>
+        <p className="text-3xl font-semibold text-white mt-1">Rp {mrr.toLocaleString("id-ID")}</p>
       </Card>
 
       <Card>

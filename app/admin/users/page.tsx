@@ -189,7 +189,7 @@ export default function UsersPage() {
                       {u.photoBase64 ? (
                         <Image src={u.photoBase64} alt={u.name} width={32} height={32} unoptimized className="rounded-full object-cover w-8 h-8" />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-lime text-dark flex items-center justify-center text-xs font-semibold">
+                        <div className="w-8 h-8 rounded-full bg-lime text-white flex items-center justify-center text-xs font-semibold">
                           {u.name.charAt(0).toUpperCase()}
                         </div>
                       )}

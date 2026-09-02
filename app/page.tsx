@@ -259,7 +259,7 @@ export default async function Home() {
             <p className="text-sm text-white/50 mt-2 leading-relaxed">{settings.tagline}</p>
           </div>
           <div>
-            <p className="text-sm font-semibold mb-3 text-lime">Kontak</p>
+            <p className="text-sm font-semibold mb-3 text-white">Kontak</p>
             <div className="space-y-1.5 text-sm text-white/60">
               {settings.contact?.email && <p>{settings.contact.email}</p>}
               {settings.contact?.phone && <p>{settings.contact.phone}</p>}
@@ -267,7 +267,7 @@ export default async function Home() {
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold mb-3 text-lime">Tautan</p>
+            <p className="text-sm font-semibold mb-3 text-white">Tautan</p>
             <div className="space-y-1.5 text-sm text-white/60">
               <Link href="/login" className="block hover:text-white">Masuk Staf</Link>
               <Link href="/register" className="block hover:text-white">Daftarkan Klinik</Link>

@@ -108,7 +108,7 @@ export default function AccreditationPage() {
 
       <Card className="bg-dark text-white">
         <p className="text-sm text-white/60">Progres Keseluruhan</p>
-        <p className="text-2xl font-semibold text-lime mt-1">{done} / {total} selesai</p>
+        <p className="text-2xl font-semibold text-white mt-1">{done} / {total} selesai</p>
         <div className="h-2 bg-white/10 rounded-full overflow-hidden mt-3">
           <div className="h-full bg-lime" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
         </div>
