@@ -12,6 +12,19 @@ type SessionUser = {
   photoBase64: string;
 };
 
+type ClinicInfo = {
+  name: string;
+  status: string;
+  trialEndsAt: string | null;
+} | null;
+
+const TRIAL_LOCKED_HREFS = new Set([
+  "/admin/insurance",
+  "/admin/procurement",
+  "/admin/chat",
+  "/admin/api-keys",
+]);
+
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: "🏠" },
   { href: "/admin/branches", label: "Manajemen Cabang", icon: "🏢" },
@@ -29,13 +42,31 @@ const NAV = [
   { href: "/admin/api-keys", label: "API Publik", icon: "🔑" },
   { href: "/admin/audit-log", label: "Audit Log", icon: "📜" },
   { href: "/admin/security", label: "Keamanan (MFA)", icon: "🔐" },
+  { href: "/admin/billing", label: "Langganan & Billing", icon: "💳" },
   { href: "/admin/settings", label: "Site Settings", icon: "⚙️" },
 ];
 
-export default function AdminShell({ user, children }: { user: SessionUser; children: ReactNode }) {
+function daysLeft(dateStr: string | null) {
+  if (!dateStr) return null;
+  const diff = new Date(dateStr).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+export default function AdminShell({
+  user,
+  clinic,
+  children,
+}: {
+  user: SessionUser;
+  clinic: ClinicInfo;
+  children: ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const isTrial = clinic?.status === "TRIAL";
+  const isBlocked = clinic?.status === "EXPIRED" || clinic?.status === "PAST_DUE";
+  const trialDays = isTrial ? daysLeft(clinic?.trialEndsAt ?? null) : null;
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -52,23 +83,26 @@ export default function AdminShell({ user, children }: { user: SessionUser; chil
         }`}
       >
         <div className="p-6 border-b border-white/10">
-          <p className="text-xl font-semibold text-lime">KlinikHub</p>
-          <p className="text-xs text-white/50">Admin Panel</p>
+          <p className="text-xl font-semibold text-lime">KlinikKita</p>
+          <p className="text-xs text-white/50 truncate">{clinic?.name || "Admin Panel"}</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
           {NAV.map((item) => {
             const active = pathname === item.href;
+            const locked = isTrial && TRIAL_LOCKED_HREFS.has(item.href);
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={locked ? "/admin/billing" : item.href}
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition ${
                   active ? "bg-green text-white" : "text-white/70 hover:bg-white/10"
-                }`}
+                } ${locked ? "opacity-50" : ""}`}
+                title={locked ? "Terkunci selama trial — upgrade untuk membuka" : undefined}
               >
                 <span>{item.icon}</span>
+                {locked && <span className="text-xs">🔒</span>}
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             );
@@ -116,11 +150,34 @@ export default function AdminShell({ user, children }: { user: SessionUser; chil
       {/* Main content */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-dark/10">
-          <p className="font-semibold text-dark">KlinikHub</p>
+          <p className="font-semibold text-dark">KlinikKita</p>
           <button onClick={() => setOpen(true)} className="text-dark cursor-pointer">
             ☰
           </button>
         </header>
+        {isTrial && (
+          <div className="px-6 lg:px-8 pt-4">
+            <div className="bg-lime/30 border border-lime text-dark text-sm rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+              <span>
+                Anda sedang di masa trial{trialDays !== null ? ` — ${trialDays} hari tersisa` : ""}. Sebagian fitur
+                terkunci (ditandai 🔒).
+              </span>
+              <Link href="/admin/billing" className="font-semibold underline shrink-0">
+                Upgrade sekarang →
+              </Link>
+            </div>
+          </div>
+        )}
+        {isBlocked && (
+          <div className="px-6 lg:px-8 pt-4">
+            <div className="bg-red-100 border border-red-300 text-red-800 text-sm rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+              <span>Langganan Anda tidak aktif. Perbarui langganan untuk terus menggunakan KlinikKita.</span>
+              <Link href="/admin/billing" className="font-semibold underline shrink-0">
+                Perbarui sekarang →
+              </Link>
+            </div>
+          </div>
+        )}
         <main className="flex-1 p-6 lg:p-8 bg-bg">{children}</main>
       </div>
     </div>

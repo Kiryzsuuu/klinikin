@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
 // akreditasi yang berlaku (mis. standar Kemenkes), bukan diimpor dari sumber resmi.
 const accreditationItemSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     category: { type: String, required: true }, // contoh: "Manajemen Klinik", "Keselamatan Pasien"
     item: { type: String, required: true },

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { User, ROLES } from "@/models/User";
-import { getSession } from "@/lib/auth";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 import { audit } from "@/lib/audit";
@@ -22,22 +22,22 @@ const updateSchema = z.object({
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  const session = await getSession();
-  if (!session) return fail("UNAUTHORIZED", "Belum login", 401);
-  if (!MANAGE_ROLES.includes(session.role)) return fail("FORBIDDEN", "Akses ditolak", 403);
+  const g = await scopedGuard(MANAGE_ROLES);
+  if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const { id } = await params;
   await connectDB();
-  const user = await User.findById(id).select("-passwordHash -mfaSecret -mfaPendingSecret");
+  const user = await User.findOne({ _id: id, ...clinicFilter }).select("-passwordHash -mfaSecret -mfaPendingSecret");
   if (!user) return fail("USER_NOT_FOUND", "Pengguna tidak ditemukan", 404);
 
   return ok(user);
 }
 
 export async function PUT(req: NextRequest, { params }: Params) {
-  const session = await getSession();
-  if (!session) return fail("UNAUTHORIZED", "Belum login", 401);
-  if (!MANAGE_ROLES.includes(session.role)) return fail("FORBIDDEN", "Akses ditolak", 403);
+  const g = await scopedGuard(MANAGE_ROLES);
+  if (isError(g)) return g.error;
+  const { session, clinicFilter } = g;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());
@@ -55,7 +55,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (photoBase64) update.photoBase64 = photoBase64;
   if (password) update.passwordHash = await bcrypt.hash(password, 10);
 
-  const user = await User.findByIdAndUpdate(id, update, { new: true }).select("-passwordHash -mfaSecret -mfaPendingSecret");
+  const user = await User.findOneAndUpdate({ _id: id, ...clinicFilter }, update, { new: true }).select("-passwordHash -mfaSecret -mfaPendingSecret");
   if (!user) return fail("USER_NOT_FOUND", "Pengguna tidak ditemukan", 404);
 
   await audit(session, "USER_UPDATE", "User", id, req, { fields: Object.keys(update) });
@@ -63,15 +63,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(req: NextRequest, { params }: Params) {
-  const session = await getSession();
-  if (!session) return fail("UNAUTHORIZED", "Belum login", 401);
-  if (!MANAGE_ROLES.includes(session.role)) return fail("FORBIDDEN", "Akses ditolak", 403);
+  const g = await scopedGuard(MANAGE_ROLES);
+  if (isError(g)) return g.error;
+  const { session, clinicFilter } = g;
 
   const { id } = await params;
   if (id === session.userId) return fail("CANNOT_DELETE_SELF", "Tidak bisa menghapus akun sendiri", 400);
 
   await connectDB();
-  const user = await User.findByIdAndDelete(id);
+  const user = await User.findOneAndDelete({ _id: id, ...clinicFilter });
   if (!user) return fail("USER_NOT_FOUND", "Pengguna tidak ditemukan", 404);
 
   await audit(session, "USER_DELETE", "User", id, req);

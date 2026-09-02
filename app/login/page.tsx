@@ -93,7 +93,7 @@ export default function LoginPage() {
     <main className="flex-1 flex items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <h1 className="text-2xl font-semibold text-dark mb-1">Masuk</h1>
-        <p className="text-dark/60 mb-6 text-sm">Selamat datang kembali di KlinikHub.</p>
+        <p className="text-dark/60 mb-6 text-sm">Selamat datang kembali di KlinikKita.</p>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div>

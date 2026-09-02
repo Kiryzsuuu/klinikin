@@ -9,6 +9,6 @@ export async function GET(req: NextRequest) {
   const check = await verifyApiKey(req.headers.get("x-api-key"), "branches:read");
   if (!check.ok) return fail("UNAUTHORIZED", check.message, check.status);
 
-  const branches = await Branch.find({ isActive: true }).select("name code type address contact");
+  const branches = await Branch.find({ clinicId: check.clinicId, isActive: true }).select("name code type address contact");
   return ok(branches);
 }

@@ -3,7 +3,8 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Invoice, generateInvoiceNo } from "@/models/Invoice";
 import { Branch } from "@/models/Branch";
-import { guard, isError, CASHIER_ROLES } from "@/lib/guard";
+import { CASHIER_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { audit } from "@/lib/audit";
 
@@ -25,8 +26,9 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const g = await guard(CASHIER_ROLES);
+  const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(100, Number(searchParams.get("limit") || 20));
   const branchId = searchParams.get("branchId");
 
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
   if (branchId) filter.branchId = branchId;
 
   const [items, total] = await Promise.all([
@@ -51,23 +53,25 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const g = await guard(CASHIER_ROLES);
+  const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
+  const { session, clinicFilter } = g;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
 
   const { branchId, patientId, visitId, items, discount = 0, tax = 0, payment } = parsed.data;
+  if (!session.clinicId) return fail("CLINIC_REQUIRED", "Akun ini tidak terhubung ke klinik", 400);
   await connectDB();
 
-  const branch = await Branch.findById(branchId);
+  const branch = await Branch.findOne({ _id: branchId, ...clinicFilter });
   if (!branch) return fail("BRANCH_NOT_FOUND", "Cabang tidak ditemukan", 404);
 
   const itemsWithSubtotal = items.map((i) => ({ ...i, subtotal: i.quantity * i.unitPrice }));
   const subtotal = itemsWithSubtotal.reduce((sum, i) => sum + i.subtotal, 0);
   const total = subtotal - discount + tax;
 
-  const invoiceNo = await generateInvoiceNo(branch.code);
+  const invoiceNo = await generateInvoiceNo(session.clinicId, branch.code);
   const invoice = await Invoice.create({
     branchId,
     patientId,
@@ -79,9 +83,10 @@ export async function POST(req: NextRequest) {
     tax,
     total,
     payment: { method: payment?.method || "CASH", status: "UNPAID" },
-    cashierId: g.session.userId,
+    cashierId: session.userId,
+    clinicId: session.clinicId,
   });
 
-  await audit(g.session, "INVOICE_CREATE", "Invoice", String(invoice._id), req, { total });
+  await audit(session, "INVOICE_CREATE", "Invoice", String(invoice._id), req, { total });
   return ok(invoice, { status: 201 });
 }

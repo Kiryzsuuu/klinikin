@@ -1,21 +1,29 @@
 import { generateText } from "ai";
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { Invoice } from "@/models/Invoice";
 import { getAiModel } from "@/lib/ai";
-import { guard, isError, MANAGE_ROLES } from "@/lib/guard";
+import { MANAGE_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 // Revenue Forecast AI (PRD 4.2.4) — insight naratif berdasarkan tren pendapatan 6 bulan terakhir
 export async function POST() {
-  const g = await guard(MANAGE_ROLES);
+  const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
+  const { session } = g;
 
   await connectDB();
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
+  const matchStage: Record<string, unknown> = { "payment.status": "PAID", createdAt: { $gte: sixMonthsAgo } };
+  if (session.role !== "SUPER_ADMIN" && session.clinicId) {
+    matchStage.clinicId = new mongoose.Types.ObjectId(session.clinicId);
+  }
+
   const monthly = await Invoice.aggregate([
-    { $match: { "payment.status": "PAID", createdAt: { $gte: sixMonthsAgo } } },
+    { $match: matchStage },
     {
       $group: {
         _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },

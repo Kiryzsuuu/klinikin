@@ -6,6 +6,7 @@ import { verifyOtp } from "@/lib/otp";
 import { signSession } from "@/lib/jwt";
 import { ok, fail } from "@/lib/response";
 import { SESSION_COOKIE } from "@/lib/auth";
+import { createTrialClinic } from "@/lib/tenant";
 
 const schema = z.object({
   email: z.string().email(),
@@ -34,14 +35,24 @@ export async function POST(req: NextRequest) {
   }
 
   if (purpose === "REGISTER") {
-    const user = await User.findOneAndUpdate(
-      { email },
-      { isEmailVerified: true, lastLogin: new Date() },
-      { new: true }
-    );
+    let user = await User.findOne({ email });
     if (!user) return fail("USER_NOT_FOUND", "Pengguna tidak ditemukan", 404);
 
-    const token = signSession({ userId: user._id.toString(), email: user.email, role: user.role });
+    if (!user.clinicId) {
+      const clinic = await createTrialClinic(user.pendingClinicName || `Klinik ${user.name}`, user.email);
+      user.clinicId = clinic._id;
+      user.pendingClinicName = "";
+    }
+    user.isEmailVerified = true;
+    user.lastLogin = new Date();
+    await user.save();
+
+    const token = signSession({
+      userId: user._id.toString(),
+      email: user.email,
+      role: user.role,
+      clinicId: user.clinicId ? String(user.clinicId) : null,
+    });
     const res = ok({ user: sanitizeUser(user) });
     res.cookies.set(SESSION_COOKIE, token, cookieOptions());
     return res;
@@ -57,6 +68,7 @@ function sanitizeUser(user: {
   email: string;
   role: string;
   photoBase64: string;
+  clinicId?: unknown;
 }) {
   return {
     id: String(user._id),
@@ -64,6 +76,7 @@ function sanitizeUser(user: {
     email: user.email,
     role: user.role,
     photoBase64: user.photoBase64,
+    clinicId: user.clinicId ? String(user.clinicId) : null,
   };
 }
 

@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession, type SessionPayload } from "@/lib/jwt";
 
-export const SESSION_COOKIE = "klinikhub_session";
+export const SESSION_COOKIE = "klinikkita_session";
 
 export async function getSession(): Promise<SessionPayload | null> {
   const cookieStore = await cookies();

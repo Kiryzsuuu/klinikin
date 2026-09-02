@@ -5,8 +5,8 @@ const siteSettingsSchema = new Schema(
   {
     key: { type: String, default: "SITE_SETTINGS", unique: true },
 
-    siteName: { type: String, default: "KlinikHub" },
-    tagline: { type: String, default: "Platform Manajemen Klinik Multi-Cabang" },
+    siteName: { type: String, default: "KlinikKita" },
+    tagline: { type: String, default: "Platform SaaS Manajemen Klinik untuk Semua Klinik" },
     description: { type: String, default: "" },
 
     // Gambar disimpan sebagai base64 data URL, bukan file terpisah.
@@ -38,12 +38,12 @@ const siteSettingsSchema = new Schema(
     },
 
     hero: {
-      title: { type: String, default: "Kelola Semua Cabang Klinik dalam Satu Dashboard" },
+      title: { type: String, default: "Satu Platform untuk Mengelola Klinik Anda" },
       subtitle: {
         type: String,
-        default: "RME, farmasi, keuangan, dan SDM terintegrasi untuk grup klinik modern.",
+        default: "RME, farmasi, keuangan, booking online, hingga SDM — semua terintegrasi. Coba gratis 14 hari, tanpa kartu kredit.",
       },
-      ctaText: { type: String, default: "Mulai Sekarang" },
+      ctaText: { type: String, default: "Coba Gratis 14 Hari" },
       ctaLink: { type: String, default: "/register" },
     },
 

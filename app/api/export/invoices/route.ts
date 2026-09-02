@@ -1,14 +1,16 @@
 import { connectDB } from "@/lib/db";
 import { Invoice } from "@/models/Invoice";
-import { guard, isError, CASHIER_ROLES } from "@/lib/guard";
+import { CASHIER_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { toCsv, csvResponse } from "@/lib/csv";
 
 export async function GET() {
-  const g = await guard(CASHIER_ROLES);
+  const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
-  const invoices = await Invoice.find({})
+  const invoices = await Invoice.find({ ...clinicFilter })
     .populate("patientId", "name")
     .populate("branchId", "name")
     .sort({ createdAt: -1 });

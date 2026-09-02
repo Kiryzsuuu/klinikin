@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { getAiModel } from "@/lib/ai";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const schema = z.object({
@@ -27,7 +28,7 @@ const suggestionSchema = z.object({
 
 // Smart Diagnosis Suggestion (PRD 4.2.1) — bukan pengganti keputusan klinis dokter
 export async function POST(req: NextRequest) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
 
   const parsed = schema.safeParse(await req.json());

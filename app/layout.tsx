@@ -11,7 +11,7 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "KlinikHub",
+  title: "KlinikKita",
   description: "Platform Manajemen Klinik Multi-Cabang",
 };
 

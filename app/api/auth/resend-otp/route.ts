@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const { code, expiresInMinutes } = await createOtp(email, purpose);
 
   try {
-    await sendMail(email, "Kode OTP KlinikHub", otpEmailTemplate(user.name, code, expiresInMinutes));
+    await sendMail(email, "Kode OTP KlinikKita", otpEmailTemplate(user.name, code, expiresInMinutes));
   } catch (err) {
     return fail("MAIL_ERROR", "Gagal mengirim email OTP", 500, err instanceof Error ? err.message : undefined);
   }

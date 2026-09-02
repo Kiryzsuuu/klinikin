@@ -1,13 +1,14 @@
 import { NextRequest } from "next/server";
 import { transcribe } from "ai";
 import { groq } from "@ai-sdk/groq";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 // Voice-to-Text RME (PRD 4.2.1) — dokter rekam suara, ditranskrip otomatis lewat
 // Groq Whisper untuk mengisi kolom Subjective (SOAP).
 export async function POST(req: NextRequest) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
 
   const modelId = process.env.GROQ_TRANSCRIBE_MODEL;

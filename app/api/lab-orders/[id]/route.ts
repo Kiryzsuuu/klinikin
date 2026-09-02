@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { LabOrder } from "@/models/LabOrder";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 
@@ -16,8 +17,9 @@ const updateSchema = z.object({
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(req: NextRequest, { params }: Params) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());
@@ -31,7 +33,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   const update: Record<string, unknown> = { ...parsed.data };
   if (parsed.data.status === "DONE") update.completedAt = new Date();
 
-  const order = await LabOrder.findByIdAndUpdate(id, update, { new: true });
+  const order = await LabOrder.findOneAndUpdate({ _id: id, ...clinicFilter }, update, { new: true });
   if (!order) return fail("ORDER_NOT_FOUND", "Order tidak ditemukan", 404);
   return ok(order);
 }

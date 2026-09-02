@@ -3,11 +3,13 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Patient } from "@/models/Patient";
+import { Clinic } from "@/models/Clinic";
 import { createOtp } from "@/lib/otp";
 import { sendMail, otpEmailTemplate } from "@/lib/mailer";
 import { ok, fail } from "@/lib/response";
 
 const schema = z.object({
+  clinicSlug: z.string().min(1),
   medicalRecordNo: z.string().min(3),
   phone: z.string().min(6),
   password: z.string().min(8),
@@ -19,10 +21,13 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422);
 
-  const { medicalRecordNo, phone, password } = parsed.data;
+  const { clinicSlug, medicalRecordNo, phone, password } = parsed.data;
   await connectDB();
 
-  const patient = await Patient.findOne({ medicalRecordNo, phone });
+  const clinic = await Clinic.findOne({ slug: clinicSlug });
+  if (!clinic) return fail("CLINIC_NOT_FOUND", "Klinik tidak ditemukan", 404);
+
+  const patient = await Patient.findOne({ clinicId: clinic._id, medicalRecordNo, phone });
   if (!patient) {
     return fail("PATIENT_NOT_FOUND", "No. RM dan No. Telepon tidak cocok dengan data klinik", 404);
   }
@@ -45,7 +50,7 @@ export async function POST(req: NextRequest) {
   try {
     await sendMail(
       patient.email,
-      "Kode OTP Aktivasi Portal Pasien - KlinikHub",
+      "Kode OTP Aktivasi Portal Pasien - KlinikKita",
       otpEmailTemplate(patient.name, code, expiresInMinutes)
     );
   } catch (err) {

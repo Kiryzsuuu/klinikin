@@ -5,7 +5,8 @@ import { Schema, model, models } from "mongoose";
 // jadi ini melacak status klaim, bukan submit otomatis ke insurer.
 const insuranceProviderSchema = new Schema(
   {
-    name: { type: String, required: true, unique: true },
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
+    name: { type: String, required: true },
     contactPerson: { type: String, default: "" },
     contactPhone: { type: String, default: "" },
     contactEmail: { type: String, default: "" },
@@ -15,10 +16,13 @@ const insuranceProviderSchema = new Schema(
   { timestamps: true }
 );
 
+insuranceProviderSchema.index({ clinicId: 1, name: 1 }, { unique: true });
+
 export const InsuranceProvider = models.InsuranceProvider || model("InsuranceProvider", insuranceProviderSchema);
 
 const insuranceClaimSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     patientId: { type: Schema.Types.ObjectId, ref: "Patient", required: true },
     invoiceId: { type: Schema.Types.ObjectId, ref: "Invoice" },

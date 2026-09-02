@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     try {
       await sendMail(
         user.email,
-        "Reset Password KlinikHub",
+        "Reset Password KlinikKita",
         otpEmailTemplate(user.name, code, expiresInMinutes)
       );
     } catch {

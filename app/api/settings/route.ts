@@ -7,7 +7,9 @@ import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 import { audit } from "@/lib/audit";
 
-const MANAGE_ROLES = ["OWNER", "ADMIN_PUSAT"];
+// SiteSettings adalah konfigurasi platform (landing page KlinikKita), bukan per-klinik —
+// hanya SUPER_ADMIN yang boleh mengubahnya, bukan OWNER/ADMIN_PUSAT klinik individual.
+const MANAGE_ROLES = ["SUPER_ADMIN"];
 
 const settingsSchema = z.object({
   siteName: z.string().min(1).optional(),

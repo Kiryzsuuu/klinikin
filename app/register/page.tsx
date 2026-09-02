@@ -7,7 +7,7 @@ import { Button, Card, Input, Label } from "@/components/ui";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
+  const [form, setForm] = useState({ clinicName: "", name: "", email: "", phone: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -35,12 +35,21 @@ export default function RegisterPage() {
   return (
     <main className="flex-1 flex items-center justify-center p-6">
       <Card className="w-full max-w-md">
-        <h1 className="text-2xl font-semibold text-dark mb-1">Daftar Akun</h1>
-        <p className="text-dark/60 mb-6 text-sm">Buat akun untuk mulai mengelola klinik Anda.</p>
+        <h1 className="text-2xl font-semibold text-dark mb-1">Daftarkan Klinik Anda</h1>
+        <p className="text-dark/60 mb-6 text-sm">Coba gratis 14 hari, tanpa kartu kredit.</p>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="name">Nama Lengkap</Label>
+            <Label htmlFor="clinicName">Nama Klinik</Label>
+            <Input
+              id="clinicName"
+              required
+              value={form.clinicName}
+              onChange={(e) => setForm({ ...form, clinicName: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="name">Nama Lengkap Anda (Owner)</Label>
             <Input id="name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           <div>

@@ -2,7 +2,8 @@ import { Schema, model, models } from "mongoose";
 
 const patientSchema = new Schema(
   {
-    medicalRecordNo: { type: String, required: true, unique: true },
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
+    medicalRecordNo: { type: String, required: true },
     registeredBranchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     name: { type: String, required: true, trim: true },
     nik: { type: String, default: "" },
@@ -36,12 +37,13 @@ const patientSchema = new Schema(
 );
 
 patientSchema.index({ name: "text" });
+patientSchema.index({ clinicId: 1, medicalRecordNo: 1 }, { unique: true });
 
-export async function generateMedicalRecordNo() {
+export async function generateMedicalRecordNo(clinicId: string) {
   const year = new Date().getFullYear();
-  const prefix = `KH-${year}-`;
+  const prefix = `KK-${year}-`;
   const last = await (models.Patient || model("Patient", patientSchema))
-    .findOne({ medicalRecordNo: { $regex: `^${prefix}` } })
+    .findOne({ clinicId, medicalRecordNo: { $regex: `^${prefix}` } })
     .sort({ medicalRecordNo: -1 });
 
   const lastSeq = last ? Number(last.medicalRecordNo.split("-").pop()) : 0;

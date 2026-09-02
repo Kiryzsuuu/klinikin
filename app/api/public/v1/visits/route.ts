@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(100, Number(searchParams.get("limit") || 20));
   const branchId = searchParams.get("branchId");
 
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { clinicId: check.clinicId };
   if (branchId) filter.branchId = branchId;
 
   const [items, total] = await Promise.all([

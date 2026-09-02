@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Invoice } from "@/models/Invoice";
-import { guard, isError, CASHIER_ROLES } from "@/lib/guard";
+import { CASHIER_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const paySchema = z.object({
@@ -14,20 +15,22 @@ const paySchema = z.object({
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  const g = await guard(CASHIER_ROLES);
+  const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const { id } = await params;
   await connectDB();
-  const invoice = await Invoice.findById(id).populate("patientId").populate("branchId", "name code");
+  const invoice = await Invoice.findOne({ _id: id, ...clinicFilter }).populate("patientId").populate("branchId", "name code");
   if (!invoice) return fail("INVOICE_NOT_FOUND", "Invoice tidak ditemukan", 404);
   return ok(invoice);
 }
 
 // Update status pembayaran (bayar tunai/QRIS/dll)
 export async function PUT(req: NextRequest, { params }: Params) {
-  const g = await guard(CASHIER_ROLES);
+  const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const { id } = await params;
   const parsed = paySchema.safeParse(await req.json());
@@ -41,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (parsed.data.method) update["payment.method"] = parsed.data.method;
   if (parsed.data.status === "PAID") update["payment.paidAt"] = new Date();
 
-  const invoice = await Invoice.findByIdAndUpdate(id, { $set: update }, { new: true });
+  const invoice = await Invoice.findOneAndUpdate({ _id: id, ...clinicFilter }, { $set: update }, { new: true });
   if (!invoice) return fail("INVOICE_NOT_FOUND", "Invoice tidak ditemukan", 404);
   return ok(invoice);
 }

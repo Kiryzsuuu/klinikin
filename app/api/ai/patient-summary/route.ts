@@ -5,24 +5,26 @@ import { connectDB } from "@/lib/db";
 import { Patient } from "@/models/Patient";
 import { Visit } from "@/models/Visit";
 import { getAiModel } from "@/lib/ai";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const schema = z.object({ patientId: z.string() });
 
 // Auto-Summary Rekam Medis (PRD 4.2.1) — ringkasan riwayat sebelum konsultasi
 export async function POST(req: NextRequest) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422);
 
   await connectDB();
-  const patient = await Patient.findById(parsed.data.patientId);
+  const patient = await Patient.findOne({ _id: parsed.data.patientId, ...clinicFilter });
   if (!patient) return fail("PATIENT_NOT_FOUND", "Pasien tidak ditemukan", 404);
 
-  const visits = await Visit.find({ patientId: patient._id }).sort({ visitDate: -1 }).limit(10);
+  const visits = await Visit.find({ patientId: patient._id, ...clinicFilter }).sort({ visitDate: -1 }).limit(10);
   if (visits.length === 0) {
     return ok({ summary: "Belum ada riwayat kunjungan untuk pasien ini." });
   }

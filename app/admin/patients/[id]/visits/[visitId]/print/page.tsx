@@ -1,15 +1,23 @@
 import { connectDB } from "@/lib/db";
 import { Visit } from "@/models/Visit";
 import { getOrCreateSettings } from "@/models/SiteSettings";
-import { notFound } from "next/navigation";
+import { getSession } from "@/lib/auth";
+import { notFound, redirect } from "next/navigation";
 import PrintButton from "./PrintButton";
 
 export default async function PrintVisitPage({ params }: { params: Promise<{ visitId: string }> }) {
   const { visitId } = await params;
+  const session = await getSession();
+  if (!session) redirect("/login");
+
   await connectDB();
 
+  const clinicFilter = session.role === "SUPER_ADMIN" ? {} : { clinicId: session.clinicId };
   const [visit, settings] = await Promise.all([
-    Visit.findById(visitId).populate("patientId").populate("doctorId", "name").populate("branchId", "name address contact"),
+    Visit.findOne({ _id: visitId, ...clinicFilter })
+      .populate("patientId")
+      .populate("doctorId", "name")
+      .populate("branchId", "name address contact"),
     getOrCreateSettings(),
   ]);
 

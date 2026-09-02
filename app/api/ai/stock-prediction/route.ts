@@ -5,7 +5,8 @@ import { connectDB } from "@/lib/db";
 import { Medicine } from "@/models/Medicine";
 import { Invoice } from "@/models/Invoice";
 import { getAiModel } from "@/lib/ai";
-import { guard, isError, PHARMACY_ROLES } from "@/lib/guard";
+import { PHARMACY_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const schema = z.object({ medicineId: z.string() });
@@ -18,21 +19,22 @@ const predictionSchema = z.object({
 
 // Prediksi Stok Obat (PRD 4.2.1) — berdasarkan tren penjualan 30 hari terakhir dari invoice
 export async function POST(req: NextRequest) {
-  const g = await guard(PHARMACY_ROLES);
+  const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422);
 
   await connectDB();
-  const medicine = await Medicine.findById(parsed.data.medicineId);
+  const medicine = await Medicine.findOne({ _id: parsed.data.medicineId, ...clinicFilter });
   if (!medicine) return fail("MEDICINE_NOT_FOUND", "Obat tidak ditemukan", 404);
 
   const since = new Date();
   since.setDate(since.getDate() - 30);
 
   const salesAgg = await Invoice.aggregate([
-    { $match: { branchId: medicine.branchId, createdAt: { $gte: since } } },
+    { $match: { branchId: medicine.branchId, clinicId: medicine.clinicId, createdAt: { $gte: since } } },
     { $unwind: "$items" },
     { $match: { "items.type": "MEDICINE", "items.name": medicine.name } },
     { $group: { _id: null, totalSold: { $sum: "$items.quantity" } } },

@@ -6,6 +6,7 @@ import { Schema, model, models } from "mongoose";
 // antar browser via STUN publik.
 const callSessionSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     roomId: { type: String, required: true, unique: true },
     bookingId: { type: Schema.Types.ObjectId, ref: "Booking" },
     status: { type: String, enum: ["WAITING", "ACTIVE", "ENDED"], default: "WAITING" },

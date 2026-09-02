@@ -1,14 +1,16 @@
 import { connectDB } from "@/lib/db";
 import { Patient } from "@/models/Patient";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { toCsv, csvResponse } from "@/lib/csv";
 
 export async function GET() {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
-  const patients = await Patient.find({ isActive: true }).populate("registeredBranchId", "name").sort({ createdAt: -1 });
+  const patients = await Patient.find({ isActive: true, ...clinicFilter }).populate("registeredBranchId", "name").sort({ createdAt: -1 });
 
   const csv = toCsv(
     patients.map((p) => ({

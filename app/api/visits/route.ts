@@ -3,7 +3,8 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Visit, generateVisitNo } from "@/models/Visit";
 import { Branch } from "@/models/Branch";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const createSchema = z.object({
@@ -15,8 +16,9 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
@@ -25,7 +27,7 @@ export async function GET(req: NextRequest) {
   const branchId = searchParams.get("branchId");
   const status = searchParams.get("status");
 
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
   if (branchId) filter.branchId = branchId;
   if (status) filter.status = status;
 
@@ -44,17 +46,19 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { session, clinicFilter } = g;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
+  if (!session.clinicId) return fail("CLINIC_REQUIRED", "Akun ini tidak terhubung ke klinik", 400);
 
   await connectDB();
-  const branch = await Branch.findById(parsed.data.branchId);
+  const branch = await Branch.findOne({ _id: parsed.data.branchId, ...clinicFilter });
   if (!branch) return fail("BRANCH_NOT_FOUND", "Cabang tidak ditemukan", 404);
 
-  const visitNo = await generateVisitNo(branch.code);
-  const visit = await Visit.create({ ...parsed.data, visitNo });
+  const visitNo = await generateVisitNo(session.clinicId, branch.code);
+  const visit = await Visit.create({ ...parsed.data, visitNo, clinicId: session.clinicId });
   return ok(visit, { status: 201 });
 }

@@ -4,6 +4,7 @@ export type SessionPayload = {
   userId: string;
   email: string;
   role: string;
+  clinicId: string | null;
 };
 
 function getSecret() {

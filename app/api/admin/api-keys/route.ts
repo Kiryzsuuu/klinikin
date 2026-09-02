@@ -3,7 +3,8 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { ApiKey } from "@/models/ApiKey";
 import { generateApiKey } from "@/lib/apiKeyAuth";
-import { guard, isError, MANAGE_ROLES } from "@/lib/guard";
+import { MANAGE_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { audit } from "@/lib/audit";
 
@@ -13,18 +14,20 @@ const createSchema = z.object({
 });
 
 export async function GET() {
-  const g = await guard(MANAGE_ROLES);
+  const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
-  const keys = await ApiKey.find({}).select("-keyHash").sort({ createdAt: -1 });
+  const keys = await ApiKey.find({ ...clinicFilter }).select("-keyHash").sort({ createdAt: -1 });
   return ok(keys);
 }
 
 // Key asli (raw) hanya dikembalikan sekali di response ini — tidak pernah disimpan/ditampilkan lagi
 export async function POST(req: NextRequest) {
-  const g = await guard(MANAGE_ROLES);
+  const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
+  const { session } = g;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
@@ -37,9 +40,10 @@ export async function POST(req: NextRequest) {
     scopes: parsed.data.scopes,
     keyHash,
     keyPrefix,
-    createdBy: g.session.userId,
+    createdBy: session.userId,
+    clinicId: session.clinicId,
   });
 
-  await audit(g.session, "API_KEY_CREATE", "ApiKey", String(created._id), req, { scopes: parsed.data.scopes });
+  await audit(session, "API_KEY_CREATE", "ApiKey", String(created._id), req, { scopes: parsed.data.scopes });
   return ok({ apiKey: raw, message: "Simpan key ini sekarang — tidak akan ditampilkan lagi." }, { status: 201 });
 }

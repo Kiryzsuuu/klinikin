@@ -3,19 +3,23 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Patient } from "@/models/Patient";
+import { Clinic } from "@/models/Clinic";
 import { signPatientSession, PATIENT_SESSION_COOKIE } from "@/lib/patientAuth";
 import { ok, fail } from "@/lib/response";
 
-const schema = z.object({ medicalRecordNo: z.string(), password: z.string() });
+const schema = z.object({ clinicSlug: z.string().min(1), medicalRecordNo: z.string(), password: z.string() });
 
 export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422);
 
-  const { medicalRecordNo, password } = parsed.data;
+  const { clinicSlug, medicalRecordNo, password } = parsed.data;
   await connectDB();
 
-  const patient = await Patient.findOne({ medicalRecordNo });
+  const clinic = await Clinic.findOne({ slug: clinicSlug });
+  if (!clinic) return fail("CLINIC_NOT_FOUND", "Klinik tidak ditemukan", 404);
+
+  const patient = await Patient.findOne({ clinicId: clinic._id, medicalRecordNo });
   if (!patient || !patient.isPortalActive || !patient.passwordHash) {
     return fail("INVALID_CREDENTIALS", "No. RM atau password salah", 401);
   }

@@ -23,5 +23,5 @@ export async function sendWhatsApp(target: string, message: string) {
 export function bookingConfirmationMessage(patientName: string, branchName: string, dateStr: string, queueNo?: string) {
   return `Halo ${patientName}, booking Anda di ${branchName} terjadwal pada ${dateStr}.${
     queueNo ? ` Nomor antrian: ${queueNo}.` : ""
-  } Terima kasih telah menggunakan KlinikHub.`;
+  } Terima kasih telah menggunakan KlinikKita.`;
 }

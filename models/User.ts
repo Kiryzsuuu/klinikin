@@ -1,6 +1,7 @@
 import { Schema, model, models, type InferSchemaType } from "mongoose";
 
 export const ROLES = [
+  "SUPER_ADMIN",
   "OWNER",
   "ADMIN_PUSAT",
   "ADMIN_CABANG",
@@ -12,6 +13,11 @@ export const ROLES = [
 
 const userSchema = new Schema(
   {
+    // null hanya untuk SUPER_ADMIN (akun platform, lintas klinik)
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", default: null, index: true },
+    // Dipakai sementara antara /register (belum verifikasi OTP) dan verify-otp
+    // (baru saat itu Clinic benar-benar dibuat, biar tidak ada klinik "sampah" kalau OTP tak pernah diverifikasi)
+    pendingClinicName: { type: String, default: "" },
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true },

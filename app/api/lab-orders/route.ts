@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { LabOrder } from "@/models/LabOrder";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const createSchema = z.object({
@@ -15,8 +16,9 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
@@ -24,7 +26,7 @@ export async function GET(req: NextRequest) {
   const branchId = searchParams.get("branchId");
   const status = searchParams.get("status");
 
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
   if (patientId) filter.patientId = patientId;
   if (branchId) filter.branchId = branchId;
   if (status) filter.status = status;
@@ -38,13 +40,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { session } = g;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
 
   await connectDB();
-  const order = await LabOrder.create({ ...parsed.data, requestedBy: g.session.userId });
+  const order = await LabOrder.create({ ...parsed.data, requestedBy: session.userId, clinicId: session.clinicId });
   return ok(order, { status: 201 });
 }

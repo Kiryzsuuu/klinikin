@@ -26,5 +26,5 @@ export async function verifyApiKey(raw: string | null, requiredScope: string) {
   apiKey.lastUsedAt = new Date();
   await apiKey.save();
 
-  return { ok: true as const };
+  return { ok: true as const, clinicId: String(apiKey.clinicId) };
 }

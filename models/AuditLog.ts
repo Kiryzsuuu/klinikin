@@ -3,6 +3,7 @@ import { Schema, model, models } from "mongoose";
 // Audit log wajib (NFR §6.2 PRD): setiap akses & perubahan data medis/sensitif dicatat.
 const auditLogSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", default: null, index: true },
     userId: { type: Schema.Types.ObjectId, ref: "User" },
     userEmail: { type: String, default: "" },
     action: { type: String, required: true }, // contoh: "PATIENT_CREATE", "VISIT_UPDATE", "USER_DELETE"

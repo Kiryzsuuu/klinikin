@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { InsuranceClaim } from "@/models/Insurance";
-import { guard, isError, CASHIER_ROLES } from "@/lib/guard";
+import { CASHIER_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const createSchema = z.object({
@@ -15,13 +16,14 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const g = await guard(CASHIER_ROLES);
+  const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
   if (status) filter.status = status;
 
   const claims = await InsuranceClaim.find(filter)
@@ -34,13 +36,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const g = await guard(CASHIER_ROLES);
+  const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
+  const { session } = g;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
 
   await connectDB();
-  const claim = await InsuranceClaim.create({ ...parsed.data, submittedBy: g.session.userId });
+  const claim = await InsuranceClaim.create({ ...parsed.data, submittedBy: session.userId, clinicId: session.clinicId });
   return ok(claim, { status: 201 });
 }

@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
 // key asli hanya ditampilkan sekali saat dibuat).
 const apiKeySchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     name: { type: String, required: true },
     keyHash: { type: String, required: true },
     keyPrefix: { type: String, required: true }, // 8 karakter pertama, untuk identifikasi di UI

@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { AccreditationItem } from "@/models/Accreditation";
-import { guard, isError, MANAGE_ROLES } from "@/lib/guard";
+import { MANAGE_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 
@@ -16,8 +17,9 @@ const updateSchema = z.object({
 type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(req: NextRequest, { params }: Params) {
-  const g = await guard(MANAGE_ROLES);
+  const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());
@@ -28,18 +30,19 @@ export async function PUT(req: NextRequest, { params }: Params) {
   }
 
   await connectDB();
-  const item = await AccreditationItem.findByIdAndUpdate(id, parsed.data, { new: true });
+  const item = await AccreditationItem.findOneAndUpdate({ _id: id, ...clinicFilter }, parsed.data, { new: true });
   if (!item) return fail("ITEM_NOT_FOUND", "Item tidak ditemukan", 404);
   return ok(item);
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
-  const g = await guard(MANAGE_ROLES);
+  const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const { id } = await params;
   await connectDB();
-  const item = await AccreditationItem.findByIdAndDelete(id);
+  const item = await AccreditationItem.findOneAndDelete({ _id: id, ...clinicFilter });
   if (!item) return fail("ITEM_NOT_FOUND", "Item tidak ditemukan", 404);
   return ok({ message: "Item dihapus" });
 }

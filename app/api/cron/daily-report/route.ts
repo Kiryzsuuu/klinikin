@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const recipients = await User.find({ role: { $in: ["OWNER", "ADMIN_PUSAT"] }, isActive: true }).select("email name");
 
   const html = `
-    <h2>Laporan Harian — KlinikHub</h2>
+    <h2>Laporan Harian — KlinikKita</h2>
     <p>${startOfDay.toLocaleDateString("id-ID")}</p>
     <ul>
       <li>Total kunjungan: ${visitCount}</li>
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
   for (const r of recipients) {
     try {
-      await sendMail(r.email, "Laporan Harian - KlinikHub", html);
+      await sendMail(r.email, "Laporan Harian - KlinikKita", html);
     } catch {
       // lanjut ke penerima berikutnya walau satu gagal
     }

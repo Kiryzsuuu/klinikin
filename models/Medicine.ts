@@ -2,6 +2,7 @@ import { Schema, model, models } from "mongoose";
 
 const medicineSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     name: { type: String, required: true, trim: true },
     genericName: { type: String, default: "" },
@@ -32,6 +33,7 @@ export const Medicine = models.Medicine || model("Medicine", medicineSchema);
 
 const stockTransferSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     medicineName: { type: String, required: true },
     fromBranchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     toBranchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },

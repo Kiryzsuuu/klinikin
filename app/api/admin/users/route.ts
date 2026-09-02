@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { User, ROLES } from "@/models/User";
-import { getSession } from "@/lib/auth";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 import { audit } from "@/lib/audit";
@@ -20,9 +20,9 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return fail("UNAUTHORIZED", "Belum login", 401);
-  if (!MANAGE_ROLES.includes(session.role)) return fail("FORBIDDEN", "Akses ditolak", 403);
+  const g = await scopedGuard(MANAGE_ROLES);
+  if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
 
@@ -31,9 +31,8 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(100, Number(searchParams.get("limit") || 20));
   const q = searchParams.get("q") || "";
 
-  const filter = q
-    ? { $or: [{ name: { $regex: q, $options: "i" } }, { email: { $regex: q, $options: "i" } }] }
-    : {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
+  if (q) filter.$or = [{ name: { $regex: q, $options: "i" } }, { email: { $regex: q, $options: "i" } }];
 
   const [items, total] = await Promise.all([
     User.find(filter)
@@ -50,9 +49,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return fail("UNAUTHORIZED", "Belum login", 401);
-  if (!MANAGE_ROLES.includes(session.role)) return fail("FORBIDDEN", "Akses ditolak", 403);
+  const g = await scopedGuard(MANAGE_ROLES);
+  if (isError(g)) return g.error;
+  const { session } = g;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
@@ -77,6 +76,7 @@ export async function POST(req: NextRequest) {
     photoBase64: photoBase64 || "",
     isEmailVerified: true,
     isActive: true,
+    clinicId: session.clinicId,
   });
 
   const result = user.toObject();

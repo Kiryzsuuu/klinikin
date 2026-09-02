@@ -2,11 +2,13 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Patient } from "@/models/Patient";
+import { Clinic } from "@/models/Clinic";
 import { verifyOtp } from "@/lib/otp";
 import { signPatientSession, PATIENT_SESSION_COOKIE } from "@/lib/patientAuth";
 import { ok, fail } from "@/lib/response";
 
 const schema = z.object({
+  clinicSlug: z.string().min(1),
   medicalRecordNo: z.string(),
   code: z.string().min(4),
   purpose: z.enum(["PATIENT_REGISTER", "PATIENT_RESET_PASSWORD"]),
@@ -16,10 +18,13 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422);
 
-  const { medicalRecordNo, code, purpose } = parsed.data;
+  const { clinicSlug, medicalRecordNo, code, purpose } = parsed.data;
   await connectDB();
 
-  const patient = await Patient.findOne({ medicalRecordNo });
+  const clinic = await Clinic.findOne({ slug: clinicSlug });
+  if (!clinic) return fail("PATIENT_NOT_FOUND", "Pasien tidak ditemukan", 404);
+
+  const patient = await Patient.findOne({ clinicId: clinic._id, medicalRecordNo });
   if (!patient || !patient.email) return fail("PATIENT_NOT_FOUND", "Pasien tidak ditemukan", 404);
 
   const result = await verifyOtp(patient.email, purpose, code);

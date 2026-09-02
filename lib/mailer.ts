@@ -18,7 +18,7 @@ function getTransporter() {
 
 export async function sendMail(to: string, subject: string, html: string) {
   const transporter = getTransporter();
-  const fromName = process.env.MAIL_FROM_NAME || "KlinikHub";
+  const fromName = process.env.MAIL_FROM_NAME || "KlinikKita";
 
   await transporter.sendMail({
     from: `"${fromName}" <${process.env.GMAIL_USER}>`,
@@ -31,7 +31,7 @@ export async function sendMail(to: string, subject: string, html: string) {
 export function otpEmailTemplate(name: string, code: string, minutes: number) {
   return `
   <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #F5F5F5; padding: 32px; border-radius: 16px;">
-    <h2 style="color: #406661; margin-bottom: 4px;">KlinikHub</h2>
+    <h2 style="color: #406661; margin-bottom: 4px;">KlinikKita</h2>
     <p style="color: #333;">Halo ${name},</p>
     <p style="color: #333;">Gunakan kode OTP berikut untuk melanjutkan proses verifikasi Anda:</p>
     <div style="background: #B9E937; color: #406661; font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 16px; border-radius: 12px; margin: 24px 0;">

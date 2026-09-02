@@ -1,4 +1,4 @@
-# KlinikHub
+# KlinikKita
 
 Platform manajemen klinik multi-cabang (monolith Next.js), dibangun sebelum dipecah menjadi
 microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-KlinikHub.md).

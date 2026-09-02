@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Visit } from "@/models/Visit";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 import { audit } from "@/lib/audit";
 
@@ -19,12 +20,13 @@ const updateSchema = z.object({
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   const { id } = await params;
   await connectDB();
-  const visit = await Visit.findById(id)
+  const visit = await Visit.findOne({ _id: id, ...clinicFilter })
     .populate("patientId")
     .populate("doctorId", "name")
     .populate("branchId", "name code");
@@ -33,16 +35,17 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 export async function PUT(req: NextRequest, { params }: Params) {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { session, clinicFilter } = g;
 
   const { id } = await params;
   const parsed = updateSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
 
   await connectDB();
-  const visit = await Visit.findByIdAndUpdate(id, parsed.data, { new: true });
+  const visit = await Visit.findOneAndUpdate({ _id: id, ...clinicFilter }, parsed.data, { new: true });
   if (!visit) return fail("VISIT_NOT_FOUND", "Kunjungan tidak ditemukan", 404);
-  await audit(g.session, "VISIT_UPDATE", "Visit", id, req, { fields: Object.keys(parsed.data) });
+  await audit(session, "VISIT_UPDATE", "Visit", id, req, { fields: Object.keys(parsed.data) });
   return ok(visit);
 }

@@ -8,6 +8,7 @@ import { sendMail, otpEmailTemplate } from "@/lib/mailer";
 import { ok, fail } from "@/lib/response";
 
 const schema = z.object({
+  clinicName: z.string().min(2),
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
     return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
   }
 
-  const { name, email, password, phone } = parsed.data;
+  const { clinicName, name, email, password, phone } = parsed.data;
   await connectDB();
 
   const existing = await User.findOne({ email });
@@ -35,15 +36,24 @@ export async function POST(req: NextRequest) {
     existing.name = name;
     existing.passwordHash = passwordHash;
     existing.phone = phone || "";
+    existing.pendingClinicName = clinicName;
     await existing.save();
   } else {
-    await User.create({ name, email, passwordHash, phone, isEmailVerified: false });
+    await User.create({
+      name,
+      email,
+      passwordHash,
+      phone,
+      pendingClinicName: clinicName,
+      role: "OWNER",
+      isEmailVerified: false,
+    });
   }
 
   const { code, expiresInMinutes } = await createOtp(email, "REGISTER");
 
   try {
-    await sendMail(email, "Kode OTP Verifikasi KlinikHub", otpEmailTemplate(name, code, expiresInMinutes));
+    await sendMail(email, "Kode OTP Verifikasi KlinikKita", otpEmailTemplate(name, code, expiresInMinutes));
   } catch (err) {
     return fail(
       "MAIL_ERROR",

@@ -1,12 +1,14 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { AuditLog } from "@/models/AuditLog";
-import { guard, isError, MANAGE_ROLES } from "@/lib/guard";
+import { MANAGE_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok } from "@/lib/response";
 
 export async function GET(req: NextRequest) {
-  const g = await guard(MANAGE_ROLES);
+  const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
@@ -15,7 +17,7 @@ export async function GET(req: NextRequest) {
   const action = searchParams.get("action");
   const resourceType = searchParams.get("resourceType");
 
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
   if (action) filter.action = action;
   if (resourceType) filter.resourceType = resourceType;
 

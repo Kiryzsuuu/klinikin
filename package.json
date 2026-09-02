@@ -1,5 +1,5 @@
 {
-  "name": "klinikhub",
+  "name": "klinikkita",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "seed:superadmin": "tsx scripts/seedSuperAdmin.ts"
   },
   "dependencies": {
     "@ai-sdk/groq": "^4.0.35",
@@ -15,6 +16,7 @@
     "ai": "^7.0.85",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.3",
+    "midtrans-client": "^1.4.3",
     "mongoose": "^9.9.4",
     "next": "16.3.3",
     "nodemailer": "^9.1.0",

@@ -1,7 +1,7 @@
 import * as OTPAuth from "otpauth";
 import QRCode from "qrcode";
 
-const ISSUER = "KlinikHub";
+const ISSUER = "KlinikKita";
 
 export function generateTotpSecret() {
   return new OTPAuth.Secret({ size: 20 }).base32;

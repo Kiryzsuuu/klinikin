@@ -2,13 +2,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { connectDB } from "@/lib/db";
 import { getOrCreateSettings } from "@/models/SiteSettings";
+import { SubscriptionPlan } from "@/models/SubscriptionPlan";
 
-// Selalu render dinamis: konten diambil dari Site Settings di DB, tidak boleh di-cache saat build.
 export const dynamic = "force-dynamic";
+
+const FEATURES = [
+  { icon: "🩺", title: "RME Lengkap", desc: "Rekam medis elektronik dengan odontogram, skin chart, hingga rujukan digital." },
+  { icon: "💊", title: "Farmasi & Stok", desc: "Kelola stok obat multi-cabang, batch, dan transfer antar cabang secara real-time." },
+  { icon: "🧾", title: "Kasir & Invoice", desc: "Penagihan cepat untuk pasien umum, BPJS, maupun asuransi swasta." },
+  { icon: "📅", title: "Booking Online", desc: "Pasien bisa booking konsultasi tatap muka maupun online lewat portal khusus klinik Anda." },
+  { icon: "✨", title: "Asisten AI", desc: "Ringkasan otomatis, saran diagnosis, hingga prediksi stok & pendapatan." },
+  { icon: "🗓️", title: "SDM & Jadwal", desc: "Atur jadwal praktik dan shift staf di semua cabang dari satu tempat." },
+];
 
 export default async function Home() {
   await connectDB();
-  const settings = await getOrCreateSettings();
+  const [settings, plans] = await Promise.all([
+    getOrCreateSettings(),
+    SubscriptionPlan.find({ isActive: true }).sort({ priceMonthly: 1 }),
+  ]);
 
   if (settings.features?.maintenanceMode) {
     return (
@@ -35,18 +47,15 @@ export default async function Home() {
           <span className="text-lg font-semibold text-dark">{settings.siteName}</span>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/booking" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
-            Booking Konsultasi
-          </Link>
-          <Link href="/portal/login" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
-            Portal Pasien
+          <Link href="#harga" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
+            Harga
           </Link>
           <Link href="/login" className="px-4 py-2 text-dark/70 hover:text-dark text-sm font-medium">
-            Masuk Staf
+            Masuk
           </Link>
           {settings.features?.registrationEnabled && (
             <Link href="/register" className="px-5 py-2 bg-green text-white rounded-2xl text-sm font-medium shadow-md shadow-green/30">
-              Daftar
+              Daftarkan Klinik
             </Link>
           )}
         </div>
@@ -83,6 +92,56 @@ export default async function Home() {
             <div className="rounded-3xl bg-linear-to-br from-lime/50 to-green/40 aspect-4/3 flex items-center justify-center">
               <span className="text-6xl">🏥</span>
             </div>
+          )}
+        </div>
+      </section>
+
+      <section className="px-6 lg:px-16 py-16 bg-white/60">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-semibold text-dark mb-3">Semua yang Klinik Anda Butuhkan</h2>
+          <p className="text-dark/60 max-w-xl mx-auto">Satu platform terintegrasi untuk operasional klinik modern, dari front office sampai laporan keuangan.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="bg-white rounded-3xl p-6 shadow-sm border border-dark/5">
+              <span className="text-3xl mb-3 block">{f.icon}</span>
+              <h3 className="font-semibold text-dark mb-1.5">{f.title}</h3>
+              <p className="text-sm text-dark/60">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="harga" className="px-6 lg:px-16 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-semibold text-dark mb-3">Harga yang Jelas, Tanpa Kejutan</h2>
+          <p className="text-dark/60 max-w-xl mx-auto">Coba gratis 14 hari, tanpa kartu kredit. Upgrade kapan saja.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {plans.map((p) => (
+            <div key={String(p._id)} className="bg-white rounded-3xl p-6 shadow-sm border border-dark/5 flex flex-col">
+              <h3 className="font-semibold text-dark text-lg mb-2">{p.name}</h3>
+              <p className="text-3xl font-semibold text-green mb-4">
+                Rp {p.priceMonthly.toLocaleString("id-ID")}
+                <span className="text-sm text-dark/50 font-normal">/bulan</span>
+              </p>
+              <ul className="text-sm text-dark/70 space-y-1.5 mb-6 flex-1">
+                <li>Maks {p.maxBranches >= 999 ? "tanpa batas" : p.maxBranches} cabang</li>
+                <li>Maks {p.maxUsers >= 999 ? "tanpa batas" : p.maxUsers} pengguna</li>
+                {p.features.map((f: string) => (
+                  <li key={f}>✓ {f}</li>
+                ))}
+              </ul>
+              <Link
+                href="/register"
+                className="text-center px-5 py-2.5 bg-green text-white rounded-2xl text-sm font-medium shadow-md shadow-green/30 hover:brightness-95"
+              >
+                Coba Gratis
+              </Link>
+            </div>
+          ))}
+          {plans.length === 0 && (
+            <p className="col-span-full text-center text-dark/40 text-sm">Paket harga belum tersedia.</p>
           )}
         </div>
       </section>

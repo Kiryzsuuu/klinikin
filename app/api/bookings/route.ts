@@ -4,11 +4,13 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { Booking } from "@/models/Booking";
 import { sendMail } from "@/lib/mailer";
-import { getSession } from "@/lib/auth";
 import { getPatientSession } from "@/lib/patientAuth";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const createSchema = z.object({
+  clinicId: z.string(),
   branchId: z.string(),
   doctorId: z.string().optional(),
   patientName: z.string().min(2),
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
     try {
       await sendMail(
         data.patientEmail,
-        "Booking Diterima - KlinikHub",
+        "Booking Diterima - KlinikKita",
         `<p>Halo ${data.patientName},</p><p>Permintaan booking Anda telah kami terima dan akan segera dikonfirmasi oleh admin klinik.</p>`
       );
     } catch {
@@ -53,15 +55,16 @@ export async function POST(req: NextRequest) {
 
 // Admin: daftar booking untuk dikonfirmasi/dikelola
 export async function GET(req: NextRequest) {
-  const session = await getSession();
-  if (!session) return fail("UNAUTHORIZED", "Belum login", 401);
+  const g = await scopedGuard(CLINICAL_ROLES);
+  if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status");
   const branchId = searchParams.get("branchId");
 
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
   if (status) filter.status = status;
   if (branchId) filter.branchId = branchId;
 

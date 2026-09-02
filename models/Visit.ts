@@ -2,10 +2,11 @@ import { Schema, model, models } from "mongoose";
 
 const visitSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     patientId: { type: Schema.Types.ObjectId, ref: "Patient", required: true },
     doctorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    visitNo: { type: String, required: true, unique: true },
+    visitNo: { type: String, required: true },
     visitDate: { type: Date, default: Date.now },
     visitType: { type: String, enum: ["RAWAT_JALAN", "RAWAT_INAP", "UGD"], default: "RAWAT_JALAN" },
     paymentType: { type: String, enum: ["UMUM", "BPJS", "ASURANSI"], default: "UMUM" },
@@ -92,15 +93,16 @@ const visitSchema = new Schema(
 
 visitSchema.index({ branchId: 1, visitDate: -1 });
 visitSchema.index({ patientId: 1, visitDate: -1 });
+visitSchema.index({ clinicId: 1, visitNo: 1 }, { unique: true });
 
-export async function generateVisitNo(branchCode: string) {
+export async function generateVisitNo(clinicId: string, branchCode: string) {
   const today = new Date();
   const datePart = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${String(
     today.getDate()
   ).padStart(2, "0")}`;
   const prefix = `${branchCode}-${datePart}-`;
   const VisitModel = models.Visit || model("Visit", visitSchema);
-  const count = await VisitModel.countDocuments({ visitNo: { $regex: `^${prefix}` } });
+  const count = await VisitModel.countDocuments({ clinicId, visitNo: { $regex: `^${prefix}` } });
   return `${prefix}${String(count + 1).padStart(3, "0")}`;
 }
 

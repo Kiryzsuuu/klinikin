@@ -6,10 +6,18 @@ import { Visit } from "@/models/Visit";
 import { Invoice } from "@/models/Invoice";
 import { Booking } from "@/models/Booking";
 import { Card } from "@/components/ui";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import mongoose from "mongoose";
 import RevenueForecast from "./RevenueForecast";
 
 export default async function AdminDashboard() {
+  const session = await getSession();
+  if (!session) redirect("/login");
   await connectDB();
+
+  const clinicFilter = { clinicId: session.clinicId };
+  const clinicObjectId = session.clinicId ? new mongoose.Types.ObjectId(session.clinicId) : null;
 
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
@@ -25,24 +33,24 @@ export default async function AdminDashboard() {
     byRole,
     visitsByStatus,
   ] = await Promise.all([
-    User.countDocuments({}),
-    Branch.countDocuments({ isActive: true }),
-    Patient.countDocuments({ isActive: true }),
-    Visit.countDocuments({ visitDate: { $gte: startOfMonth } }),
+    User.countDocuments(clinicFilter),
+    Branch.countDocuments({ ...clinicFilter, isActive: true }),
+    Patient.countDocuments({ ...clinicFilter, isActive: true }),
+    Visit.countDocuments({ ...clinicFilter, visitDate: { $gte: startOfMonth } }),
     Invoice.aggregate([
-      { $match: { "payment.status": "PAID", createdAt: { $gte: startOfMonth } } },
+      { $match: { clinicId: clinicObjectId, "payment.status": "PAID", createdAt: { $gte: startOfMonth } } },
       { $group: { _id: null, total: { $sum: "$total" } } },
     ]),
-    Booking.countDocuments({ status: "PENDING" }),
-    User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]),
-    Visit.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+    Booking.countDocuments({ ...clinicFilter, status: "PENDING" }),
+    User.aggregate([{ $match: { clinicId: clinicObjectId } }, { $group: { _id: "$role", count: { $sum: 1 } } }]),
+    Visit.aggregate([{ $match: { clinicId: clinicObjectId } }, { $group: { _id: "$status", count: { $sum: 1 } } }]),
   ]);
 
   const revenueThisMonth = revenueAgg[0]?.total || 0;
 
   // KPI dokter: jumlah kunjungan & kunjungan selesai bulan ini
   const kpiByDoctor = await Visit.aggregate([
-    { $match: { visitDate: { $gte: startOfMonth } } },
+    { $match: { clinicId: clinicObjectId, visitDate: { $gte: startOfMonth } } },
     {
       $group: {
         _id: "$doctorId",
@@ -67,7 +75,7 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold text-dark">Dashboard</h1>
-        <p className="text-dark/60">Ringkasan bisnis KlinikHub lintas cabang.</p>
+        <p className="text-dark/60">Ringkasan bisnis KlinikKita lintas cabang.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

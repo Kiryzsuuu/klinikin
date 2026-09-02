@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-export const PATIENT_SESSION_COOKIE = "klinikhub_patient_session";
+export const PATIENT_SESSION_COOKIE = "klinikkita_patient_session";
 
 export type PatientSessionPayload = { patientId: string; medicalRecordNo: string };
 

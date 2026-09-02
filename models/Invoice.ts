@@ -2,10 +2,11 @@ import { Schema, model, models } from "mongoose";
 
 const invoiceSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     patientId: { type: Schema.Types.ObjectId, ref: "Patient", required: true },
     visitId: { type: Schema.Types.ObjectId, ref: "Visit" },
-    invoiceNo: { type: String, required: true, unique: true },
+    invoiceNo: { type: String, required: true },
 
     items: [
       {
@@ -35,15 +36,16 @@ const invoiceSchema = new Schema(
 );
 
 invoiceSchema.index({ branchId: 1, createdAt: -1 });
+invoiceSchema.index({ clinicId: 1, invoiceNo: 1 }, { unique: true });
 
-export async function generateInvoiceNo(branchCode: string) {
+export async function generateInvoiceNo(clinicId: string, branchCode: string) {
   const today = new Date();
   const datePart = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${String(
     today.getDate()
   ).padStart(2, "0")}`;
   const prefix = `INV-${branchCode}-${datePart}-`;
   const InvoiceModel = models.Invoice || model("Invoice", invoiceSchema);
-  const count = await InvoiceModel.countDocuments({ invoiceNo: { $regex: `^${prefix}` } });
+  const count = await InvoiceModel.countDocuments({ clinicId, invoiceNo: { $regex: `^${prefix}` } });
   return `${prefix}${String(count + 1).padStart(3, "0")}`;
 }
 

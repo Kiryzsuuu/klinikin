@@ -2,7 +2,8 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { PurchaseOrder, generatePoNo } from "@/models/Procurement";
-import { guard, isError, PHARMACY_ROLES } from "@/lib/guard";
+import { PHARMACY_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const itemSchema = z.object({ medicineName: z.string(), quantity: z.number().positive(), unitPrice: z.number().min(0) });
@@ -14,13 +15,14 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const g = await guard(PHARMACY_ROLES);
+  const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
   const branchId = searchParams.get("branchId");
-  const filter: Record<string, unknown> = {};
+  const filter: Record<string, unknown> = { ...clinicFilter };
   if (branchId) filter.branchId = branchId;
 
   const orders = await PurchaseOrder.find(filter)
@@ -32,17 +34,19 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const g = await guard(PHARMACY_ROLES);
+  const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
+  const { session } = g;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
 
   const { branchId, supplierId, items } = parsed.data;
   const total = items.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+  if (!session.clinicId) return fail("CLINIC_REQUIRED", "Akun ini tidak terhubung ke klinik", 400);
 
   await connectDB();
-  const poNo = await generatePoNo();
+  const poNo = await generatePoNo(session.clinicId);
   const po = await PurchaseOrder.create({
     branchId,
     supplierId,
@@ -50,7 +54,8 @@ export async function POST(req: NextRequest) {
     items,
     total,
     status: "DRAFT",
-    orderedBy: g.session.userId,
+    orderedBy: session.userId,
+    clinicId: session.clinicId,
   });
 
   return ok(po, { status: 201 });

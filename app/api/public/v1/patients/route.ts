@@ -16,12 +16,12 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(100, Number(searchParams.get("limit") || 20));
 
   const [items, total] = await Promise.all([
-    Patient.find({ isActive: true })
+    Patient.find({ clinicId: check.clinicId, isActive: true })
       .select("medicalRecordNo name gender registeredBranchId createdAt")
       .populate("registeredBranchId", "name code")
       .skip((page - 1) * limit)
       .limit(limit),
-    Patient.countDocuments({ isActive: true }),
+    Patient.countDocuments({ clinicId: check.clinicId, isActive: true }),
   ]);
 
   return ok(items, { meta: { page, limit, total, totalPages: Math.ceil(total / limit) } });

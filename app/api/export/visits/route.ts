@@ -1,14 +1,16 @@
 import { connectDB } from "@/lib/db";
 import { Visit } from "@/models/Visit";
-import { guard, isError, CLINICAL_ROLES } from "@/lib/guard";
+import { CLINICAL_ROLES } from "@/lib/guard";
+import { scopedGuard, isError } from "@/lib/tenant";
 import { toCsv, csvResponse } from "@/lib/csv";
 
 export async function GET() {
-  const g = await guard(CLINICAL_ROLES);
+  const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;
+  const { clinicFilter } = g;
 
   await connectDB();
-  const visits = await Visit.find({})
+  const visits = await Visit.find({ ...clinicFilter })
     .populate("patientId", "name medicalRecordNo")
     .populate("doctorId", "name")
     .populate("branchId", "name")

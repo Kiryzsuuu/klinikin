@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
 // teks + file (PDF/gambar) base64, bukan integrasi alat lab fisik.
 const labOrderSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     patientId: { type: Schema.Types.ObjectId, ref: "Patient", required: true },
     visitId: { type: Schema.Types.ObjectId, ref: "Visit" },

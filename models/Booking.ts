@@ -4,6 +4,7 @@ import { Schema, model, models } from "mongoose";
 // cukup nama + kontak. Admin/cabang mengonfirmasi lalu mengonversinya jadi Visit.
 const bookingSchema = new Schema(
   {
+    clinicId: { type: Schema.Types.ObjectId, ref: "Clinic", required: true, index: true },
     branchId: { type: Schema.Types.ObjectId, ref: "Branch", required: true },
     doctorId: { type: Schema.Types.ObjectId, ref: "User" },
     patientId: { type: Schema.Types.ObjectId, ref: "Patient" }, // terisi jika dibuat dari Patient Portal (sudah login)

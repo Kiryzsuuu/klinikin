@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { User } from "@/models/User";
+import { Clinic } from "@/models/Clinic";
 import { signSession, signMfaPendingToken } from "@/lib/jwt";
 import { ok, fail } from "@/lib/response";
 import { SESSION_COOKIE } from "@/lib/auth";
@@ -27,6 +28,13 @@ export async function POST(req: NextRequest) {
   const validPassword = await bcrypt.compare(password, user.passwordHash);
   if (!validPassword) return fail("INVALID_CREDENTIALS", "Email atau password salah", 401);
 
+  if (user.role !== "SUPER_ADMIN") {
+    const clinic = await Clinic.findById(user.clinicId);
+    if (!clinic || !clinic.isActive || clinic.subscription?.status === "SUSPENDED") {
+      return fail("CLINIC_SUSPENDED", "Akun klinik Anda dinonaktifkan. Hubungi admin KlinikKita.", 403);
+    }
+  }
+
   if (user.mfaEnabled) {
     const mfaToken = signMfaPendingToken(user._id.toString());
     return ok({ mfaRequired: true, mfaToken });
@@ -35,7 +43,12 @@ export async function POST(req: NextRequest) {
   user.lastLogin = new Date();
   await user.save();
 
-  const token = signSession({ userId: user._id.toString(), email: user.email, role: user.role });
+  const token = signSession({
+    userId: user._id.toString(),
+    email: user.email,
+    role: user.role,
+    clinicId: user.clinicId ? String(user.clinicId) : null,
+  });
 
   const res = ok({
     user: {
