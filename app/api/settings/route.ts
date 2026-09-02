@@ -28,6 +28,17 @@ const settingsSchema = z.object({
       backgroundColor: z.string().optional(),
       fontFamily: z.string().optional(),
       borderRadius: z.string().optional(),
+      sections: z
+        .object({
+          hero: z.string().optional(),
+          features: z.string().optional(),
+          whyUs: z.string().optional(),
+          stats: z.string().optional(),
+          pricing: z.string().optional(),
+          faq: z.string().optional(),
+          footer: z.string().optional(),
+        })
+        .optional(),
     })
     .optional(),
   contact: z

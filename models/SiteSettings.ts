@@ -24,6 +24,16 @@ const siteSettingsSchema = new Schema(
       backgroundColor: { type: String, default: "#F5F5F5" },
       fontFamily: { type: String, default: "Plus Jakarta Sans" },
       borderRadius: { type: String, default: "1rem" },
+      // Warna font landing page, bisa diatur berbeda per bagian.
+      sections: {
+        hero: { type: String, default: "#406661" },
+        features: { type: String, default: "#406661" },
+        whyUs: { type: String, default: "#406661" },
+        stats: { type: String, default: "#406661" },
+        pricing: { type: String, default: "#406661" },
+        faq: { type: String, default: "#406661" },
+        footer: { type: String, default: "#ffffff" },
+      },
     },
 
     contact: {

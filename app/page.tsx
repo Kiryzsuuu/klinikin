@@ -65,6 +65,9 @@ export default async function Home() {
   }
 
   const theme = settings.theme || {};
+  const sectionColors = theme.sections || {};
+  const colorVar = (color?: string): CSSProperties =>
+    color ? ({ "--color-dark": color } as CSSProperties) : {};
 
   return (
     <main
@@ -115,7 +118,10 @@ export default async function Home() {
             : { background: "linear-gradient(135deg, var(--color-dark), var(--color-green))" }
         }
       >
-        <div className="max-w-2xl w-full mx-6 mb-12 lg:mb-16 bg-white/95 border-t-4 border-green px-8 py-10 text-center shadow-2xl">
+        <div
+          className="max-w-2xl w-full mx-6 mb-12 lg:mb-16 bg-white/95 border-t-4 border-green px-8 py-10 text-center shadow-2xl"
+          style={colorVar(sectionColors.hero)}
+        >
           <span className="inline-block px-4 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider mb-5 bg-lime/40 text-dark">
             {settings.tagline}
           </span>
@@ -130,7 +136,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="fitur" className="relative px-6 lg:px-16 -mt-16 z-10">
+      <section id="fitur" className="relative px-6 lg:px-16 -mt-16 z-10" style={colorVar(sectionColors.features)}>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-dark/5 max-w-6xl mx-auto shadow-[0px_0_25px_rgba(0,0,0,0.1)]">
           {HIGHLIGHTS.map((f) => (
             <div key={f.title} className="bg-white p-8 text-center">
@@ -155,7 +161,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="px-6 lg:px-16 py-20">
+      <section className="px-6 lg:px-16 py-20" style={colorVar(sectionColors.whyUs)}>
         <div className="grid lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
           <div className="relative min-h-[360px]">
             {settings.heroImageBase64 ? (
@@ -189,7 +195,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="px-6 lg:px-16 py-16">
+      <section className="px-6 lg:px-16 py-16" style={colorVar(sectionColors.stats)}>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {STATS.map((s) => (
             <div key={s.label} className="bg-white shadow-[0px_0_30px_rgba(0,0,0,0.08)] p-7 flex items-center gap-5">
@@ -203,7 +209,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section id="harga" className="px-6 lg:px-16 py-20 bg-white/60">
+      <section id="harga" className="px-6 lg:px-16 py-20 bg-white/60" style={colorVar(sectionColors.pricing)}>
         <SectionTitle eyebrow="Harga" title="Harga yang Jelas, Tanpa Kejutan" subtitle="Coba gratis 14 hari, tanpa kartu kredit. Upgrade kapan saja." />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map((p, i) => (
@@ -247,36 +253,39 @@ export default async function Home() {
       </section>
 
       {settings.faqs?.length > 0 && (
-        <section id="faq" className="px-6 lg:px-16 py-16">
+        <section id="faq" className="px-6 lg:px-16 py-16" style={colorVar(sectionColors.faq)}>
           <SectionTitle eyebrow="Pertanyaan Umum" title="Yang Sering Ditanyakan" />
           <Faq faqs={settings.faqs} layout={settings.faqLayout || "accordion"} />
         </section>
       )}
 
-      <footer className="px-6 lg:px-16 py-14 bg-dark text-white">
+      <footer
+        className="px-6 lg:px-16 py-14 bg-dark text-(--color-footer)"
+        style={{ "--color-footer": sectionColors.footer || "#ffffff" } as CSSProperties}
+      >
         <div className="max-w-5xl mx-auto grid sm:grid-cols-3 gap-8 mb-10">
           <div>
             <span className="text-lg font-bold">{settings.siteName}</span>
-            <p className="text-sm text-white/50 mt-2 leading-relaxed">{settings.tagline}</p>
+            <p className="text-sm text-(--color-footer)/50 mt-2 leading-relaxed">{settings.tagline}</p>
           </div>
           <div>
-            <p className="text-sm font-semibold mb-3 text-white">Kontak</p>
-            <div className="space-y-1.5 text-sm text-white/60">
+            <p className="text-sm font-semibold mb-3">Kontak</p>
+            <div className="space-y-1.5 text-sm text-(--color-footer)/60">
               {settings.contact?.email && <p>{settings.contact.email}</p>}
               {settings.contact?.phone && <p>{settings.contact.phone}</p>}
               {settings.contact?.address && <p>{settings.contact.address}</p>}
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold mb-3 text-white">Tautan</p>
-            <div className="space-y-1.5 text-sm text-white/60">
-              <Link href="/login" className="block hover:text-white">Masuk Staf</Link>
-              <Link href="/register" className="block hover:text-white">Daftarkan Klinik</Link>
-              <Link href="#harga" className="block hover:text-white">Harga</Link>
+            <p className="text-sm font-semibold mb-3">Tautan</p>
+            <div className="space-y-1.5 text-sm text-(--color-footer)/60">
+              <Link href="/login" className="block hover:opacity-80">Masuk Staf</Link>
+              <Link href="/register" className="block hover:opacity-80">Daftarkan Klinik</Link>
+              <Link href="#harga" className="block hover:opacity-80">Harga</Link>
             </div>
           </div>
         </div>
-        <div className="max-w-5xl mx-auto pt-6 border-t border-white/10 text-sm text-white/40">
+        <div className="max-w-5xl mx-auto pt-6 border-t border-(--color-footer)/10 text-sm text-(--color-footer)/40">
           &copy; {new Date().getFullYear()} Nusa Inspira Teknologi (RFS). Semua hak dilindungi.
         </div>
       </footer>

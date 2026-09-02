@@ -21,6 +21,15 @@ type Settings = {
     backgroundColor: string;
     fontFamily: string;
     borderRadius: string;
+    sections: {
+      hero: string;
+      features: string;
+      whyUs: string;
+      stats: string;
+      pricing: string;
+      faq: string;
+      footer: string;
+    };
   };
   contact: { email: string; phone: string; whatsapp: string; address: string };
   socials: { instagram: string; facebook: string; tiktok: string; youtube: string };
@@ -52,6 +61,10 @@ export default function SettingsPage() {
 
   function updateNested<K extends keyof Settings>(key: K, patch: Partial<Settings[K]>) {
     setSettings((s) => (s ? { ...s, [key]: { ...(s[key] as object), ...patch } } : s));
+  }
+
+  function updateSectionColor(section: keyof Settings["theme"]["sections"], value: string) {
+    setSettings((s) => (s ? { ...s, theme: { ...s.theme, sections: { ...s.theme.sections, [section]: value } } } : s));
   }
 
   function addFaq() {
@@ -177,6 +190,22 @@ export default function SettingsPage() {
               <Label>Border Radius</Label>
               <Input value={settings.theme.borderRadius} onChange={(e) => updateNested("theme", { borderRadius: e.target.value })} />
             </div>
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="font-semibold text-dark mb-1">Warna Font per Bagian</h2>
+          <p className="text-xs text-dark/40 mb-4">
+            Atur warna font landing page berbeda-beda untuk tiap bagian. Kosongkan ke warna default kalau tidak perlu dibedakan.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <ColorField label="Hero (banner atas)" value={settings.theme.sections.hero} onChange={(v) => updateSectionColor("hero", v)} />
+            <ColorField label="Fitur Unggulan" value={settings.theme.sections.features} onChange={(v) => updateSectionColor("features", v)} />
+            <ColorField label="Kenapa Pilih Kami" value={settings.theme.sections.whyUs} onChange={(v) => updateSectionColor("whyUs", v)} />
+            <ColorField label="Statistik" value={settings.theme.sections.stats} onChange={(v) => updateSectionColor("stats", v)} />
+            <ColorField label="Harga" value={settings.theme.sections.pricing} onChange={(v) => updateSectionColor("pricing", v)} />
+            <ColorField label="FAQ" value={settings.theme.sections.faq} onChange={(v) => updateSectionColor("faq", v)} />
+            <ColorField label="Footer" value={settings.theme.sections.footer} onChange={(v) => updateSectionColor("footer", v)} />
           </div>
         </Card>
 
