@@ -120,7 +120,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6 max-w-3xl mx-auto">
       <div>
         <h1 className="text-2xl font-semibold text-dark">Site Settings</h1>
         <p className="text-dark/60">Kustomisasi tampilan dan konten situs sepenuhnya.</p>
