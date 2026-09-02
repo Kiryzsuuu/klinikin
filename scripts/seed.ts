@@ -7,7 +7,7 @@ import { getOrCreateSettings } from "../models/SiteSettings";
 import { SubscriptionPlan } from "../models/SubscriptionPlan";
 import { createTrialClinic } from "../lib/tenant";
 
-// features: key dari lib/features.ts (FEATURE_KEYS), bukan teks bebas — dipakai requireFeature()
+// features: key dari lib/features.ts (FEATURE_KEYS), bukan teks bebas; dipakai requireFeature()
 // untuk menggerbang akses beneran, bukan sekadar teks marketing di halaman harga. Tidak ada
 // modul yang otomatis terbuka di luar trial, jadi modul inti (patients/pharmacy/cashier/booking)
 // tetap harus dicantumkan eksplisit di setiap paket.

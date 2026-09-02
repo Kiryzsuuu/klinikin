@@ -5,7 +5,7 @@ import { Clinic } from "@/models/Clinic";
 import { ok, fail } from "@/lib/response";
 import { verifyNotificationSignature } from "@/lib/integrations/midtrans";
 
-// Dipanggil oleh server Midtrans (bukan browser) — atur URL ini sebagai
+// Dipanggil oleh server Midtrans (bukan browser): atur URL ini sebagai
 // "Payment Notification URL" di dashboard.midtrans.com/settings/config_info.
 export async function POST(req: NextRequest) {
   const body = await req.json();

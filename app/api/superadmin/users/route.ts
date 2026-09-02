@@ -9,7 +9,7 @@ import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 import { audit } from "@/lib/audit";
 
-// Manajemen user lintas klinik — hanya SUPER_ADMIN. Beda dari /api/admin/users yang
+// Manajemen user lintas klinik: hanya SUPER_ADMIN. Beda dari /api/admin/users yang
 // otomatis di-scope ke klinik staf yang login.
 const createSchema = z
   .object({

@@ -7,7 +7,7 @@ import { ok, fail } from "@/lib/response";
 import { isValidBase64Image } from "@/lib/image";
 import { audit } from "@/lib/audit";
 
-// SiteSettings adalah konfigurasi platform (landing page KlinikKita), bukan per-klinik —
+// SiteSettings adalah konfigurasi platform (landing page KlinikKita), bukan per-klinik:
 // hanya SUPER_ADMIN yang boleh mengubahnya, bukan OWNER/ADMIN_PUSAT klinik individual.
 const MANAGE_ROLES = ["SUPER_ADMIN"];
 

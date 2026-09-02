@@ -5,7 +5,7 @@ import { LabOrder } from "@/models/LabOrder";
 import { getPatientSession } from "@/lib/patientAuth";
 import { ok, fail } from "@/lib/response";
 
-// Data pasien untuk portal: profil sendiri + riwayat kunjungan + hasil lab —
+// Data pasien untuk portal: profil sendiri + riwayat kunjungan + hasil lab,
 // inilah "akses riwayat medis sendiri" dari PRD Patient Portal.
 export async function GET() {
   const session = await getPatientSession();

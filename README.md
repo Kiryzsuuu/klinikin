@@ -20,11 +20,11 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
 - Farmasi & Stok Obat, termasuk transfer stok antar cabang
 - Kasir & Invoice (multi item, status pembayaran)
 - Laboratorium & Radiologi (order, hasil teks + file)
-- Asuransi swasta — daftar provider + pelacakan status klaim manual
-- Procurement obat — supplier + purchase order, stok otomatis bertambah saat status RECEIVED
-- SDM — jadwal praktik/shift staf per cabang
+- Asuransi swasta: daftar provider + pelacakan status klaim manual
+- Procurement obat: supplier + purchase order, stok otomatis bertambah saat status RECEIVED
+- SDM: jadwal praktik/shift staf per cabang
 - Checklist Akreditasi per cabang dengan bukti upload
-- Booking Pasien publik (`/booking`) — admin konfirmasi → otomatis buat pasien + kunjungan RME
+- Booking Pasien publik (`/booking`): admin konfirmasi → otomatis buat pasien + kunjungan RME
 
 **Patient Portal (`/portal`)**
 - Pasien daftar akun sendiri (cocokkan No. RM + telepon dari data klinik) + verifikasi OTP email
@@ -32,23 +32,23 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
 - Lihat riwayat kunjungan, diagnosis, obat, dan hasil lab sendiri
 - Booking konsultasi baru langsung dari dashboard
 
-**AI (lewat Groq — `@ai-sdk/groq`)**
-- ✨ Smart Diagnosis Suggestion — saran ICD-10 dari gejala
-- ✨ Auto-Summary Rekam Medis — ringkasan riwayat pasien sebelum konsultasi
-- ✨ Voice-to-Text RME — rekam suara dokter, ditranskrip otomatis (Groq Whisper) ke kolom Subjective
-- ✨ Prediksi Stok Obat — estimasi kebutuhan 30 hari berdasarkan tren penjualan invoice
-- ✨ Revenue Forecast — analisis tren pendapatan 6 bulan di dashboard
+**AI (lewat Groq, `@ai-sdk/groq`)**
+- ✨ Smart Diagnosis Suggestion: saran ICD-10 dari gejala
+- ✨ Auto-Summary Rekam Medis: ringkasan riwayat pasien sebelum konsultasi
+- ✨ Voice-to-Text RME: rekam suara dokter, ditranskrip otomatis (Groq Whisper) ke kolom Subjective
+- ✨ Prediksi Stok Obat: estimasi kebutuhan 30 hari berdasarkan tren penjualan invoice
+- ✨ Revenue Forecast: analisis tren pendapatan 6 bulan di dashboard
 - ✨ Asisten AI Chat internal untuk staf (`/admin/chat`)
 
 **Konsultasi Online (Interactive Call)**
-- Video call 1:1 berbasis WebRTC P2P (`/call/[roomId]`), signaling lewat polling API — **tidak
+- Video call 1:1 berbasis WebRTC P2P (`/call/[roomId]`), signaling lewat polling API: **tidak
   butuh akun provider pihak ketiga**, cukup browser modern + izin kamera/mikrofon. Room dibuat
   otomatis saat booking dengan tipe "Konsultasi Online" dikonfirmasi.
 
 **Keamanan & Compliance**
-- Audit Log (`/admin/audit-log`) — mencatat setiap akses & perubahan data pasien/kunjungan/user/
+- Audit Log (`/admin/audit-log`): mencatat setiap akses & perubahan data pasien/kunjungan/user/
   settings/API key (NFR wajib di PRD)
-- MFA/TOTP (`/admin/security`) — opsional per akun, sangat disarankan untuk OWNER & ADMIN_PUSAT;
+- MFA/TOTP (`/admin/security`): opsional per akun, sangat disarankan untuk OWNER & ADMIN_PUSAT;
   begitu diaktifkan, login akan minta kode dari Google Authenticator/Authy setelah password benar
 
 **RME Lanjutan**
@@ -62,7 +62,7 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
 
 **Background Jobs (Vercel Cron)**
 - `vercel.json` menjadwalkan `/api/cron/stock-alert` (harian) dan `/api/cron/daily-report`
-  (harian) — mengirim email ringkasan ke OWNER/ADMIN_PUSAT. Endpoint dilindungi `CRON_SECRET`;
+  (harian): mengirim email ringkasan ke OWNER/ADMIN_PUSAT. Endpoint dilindungi `CRON_SECRET`;
   di luar Vercel, jadwalkan sendiri lewat cron/task scheduler yang memanggil endpoint tersebut
   dengan header `Authorization: Bearer <CRON_SECRET>`.
 
@@ -71,22 +71,22 @@ microservices sesuai [`TECH-ARCHITECTURE-KlinikHub.md`](./TECH-ARCHITECTURE-Klin
 Kerangka kodenya sudah disiapkan, tapi tidak bisa aktif tanpa Anda mendaftar & mengisi kredensial
 sendiri di `.env.local`:
 
-- **SATUSEHAT** (`lib/integrations/satusehat.ts`) — client_id/secret resmi dari Kemenkes
-- **BPJS PCare** (`lib/integrations/bpjs.ts`) — Cons ID/Secret Key resmi dari BPJS Kesehatan
-- **WhatsApp notifikasi** (`lib/integrations/whatsapp.ts`) — token device Fonnte
-- **Groq AI** — `GROQ_API_KEY` dari console.groq.com, plus verifikasi `GROQ_MODEL` &
+- **SATUSEHAT** (`lib/integrations/satusehat.ts`): client_id/secret resmi dari Kemenkes
+- **BPJS PCare** (`lib/integrations/bpjs.ts`): Cons ID/Secret Key resmi dari BPJS Kesehatan
+- **WhatsApp notifikasi** (`lib/integrations/whatsapp.ts`): token device Fonnte
+- **Groq AI**: `GROQ_API_KEY` dari console.groq.com, plus verifikasi `GROQ_MODEL` &
   `GROQ_TRANSCRIBE_MODEL` masih tersedia (daftar model Groq berubah cukup sering)
 
 **Catatan jujur soal "Asuransi Swasta" & "Procurement Obat":** tidak ada API generik untuk
-integrasi ke insurer atau marketplace obat pihak ketiga — masing-masing punya sistem sendiri.
+integrasi ke insurer atau marketplace obat pihak ketiga, masing-masing punya sistem sendiri.
 Modul ini jadi pencatatan/pelacakan status manual, bukan submit/order otomatis ke pihak eksternal.
 
 ## Yang masih belum dikerjakan (di luar cakupan software murni)
 
-- **Absensi fingerprint/face recognition** & **slip gaji/insentif otomatis** — butuh integrasi
+- **Absensi fingerprint/face recognition** & **slip gaji/insentif otomatis**: butuh integrasi
   perangkat keras fisik yang tidak bisa disediakan lewat kode saja
-- **Integrasi alat medis** (lab analyzer, ECG) — butuh driver/protokol alat fisik tertentu
-- **Aplikasi mobile pasien (React Native)** — di luar cakupan, saat ini hanya web portal
+- **Integrasi alat medis** (lab analyzer, ECG): butuh driver/protokol alat fisik tertentu
+- **Aplikasi mobile pasien (React Native)**: di luar cakupan, saat ini hanya web portal
 
 ## Setup
 
@@ -99,7 +99,7 @@ npm run seed   # buat akun OWNER pertama
 npm run dev
 ```
 
-Buka http://localhost:3000 — login staf di `/login`, kelola semuanya di `/admin`. Pasien
+Buka http://localhost:3000, login staf di `/login`, kelola semuanya di `/admin`. Pasien
 mendaftar/login sendiri di `/portal`. Landing page publik (`/`) dan form booking (`/booking`)
 tidak butuh login sama sekali.
 
@@ -109,7 +109,7 @@ Password di https://myaccount.google.com/apppasswords.
 
 ### Catatan Groq
 Ambil `GROQ_API_KEY` di https://console.groq.com/keys. Cek model chat & Whisper transcription
-yang masih didukung di https://console.groq.com/docs/models sebelum deploy — jangan asumsikan
+yang masih didukung di https://console.groq.com/docs/models sebelum deploy: jangan asumsikan
 default di `.env.example` masih berlaku.
 
 ## Struktur

@@ -11,7 +11,7 @@ import { ok, fail } from "@/lib/response";
 
 const schema = z.object({ patientId: z.string() });
 
-// Auto-Summary Rekam Medis (PRD 4.2.1) — ringkasan riwayat sebelum konsultasi
+// Auto-Summary Rekam Medis (PRD 4.2.1): ringkasan riwayat sebelum konsultasi
 export async function POST(req: NextRequest) {
   const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;

@@ -29,7 +29,7 @@ export function verifySession(token: string): SessionPayload | null {
 
 export type MfaPendingPayload = { userId: string; mfaPending: true };
 
-// Token sementara (5 menit) dipakai antara "password benar" dan "kode MFA terverifikasi" —
+// Token sementara (5 menit) dipakai antara "password benar" dan "kode MFA terverifikasi":
 // dikirim di response body, bukan cookie, sampai MFA lolos baru session cookie diterbitkan.
 export function signMfaPendingToken(userId: string) {
   return jwt.sign({ userId, mfaPending: true } satisfies MfaPendingPayload, getSecret(), { expiresIn: "5m" });

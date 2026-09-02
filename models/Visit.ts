@@ -21,7 +21,7 @@ const visitSchema = new Schema(
       weight: { type: Number },
       height: { type: Number },
       physicalExam: { type: String, default: "" },
-      // Foto/dokumen medis (hasil scan, foto luka, dsb) — base64 langsung di dokumen
+      // Foto/dokumen medis (hasil scan, foto luka, dsb): base64 langsung di dokumen
       attachments: [{ type: String }],
     },
     assessment: {
@@ -55,7 +55,7 @@ const visitSchema = new Schema(
 
     aiSummary: { type: String, default: "" },
 
-    // Odontogram (klinik gigi) — status 32 gigi permanen, dicatat hanya saat relevan
+    // Odontogram (klinik gigi): status 32 gigi permanen, dicatat hanya saat relevan
     dentalChart: [
       {
         toothNumber: { type: Number, min: 1, max: 32 },
@@ -68,7 +68,7 @@ const visitSchema = new Schema(
       },
     ],
 
-    // Skin chart (klinik kecantikan) — area kulit + kondisi yang dicatat dokter
+    // Skin chart (klinik kecantikan): area kulit + kondisi yang dicatat dokter
     skinChart: [
       {
         area: { type: String, required: true },

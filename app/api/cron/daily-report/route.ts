@@ -6,7 +6,7 @@ import { User } from "@/models/User";
 import { sendMail } from "@/lib/mailer";
 import { verifyCronSecret } from "@/lib/cronAuth";
 
-// Dijadwalkan via Vercel Cron (lihat vercel.json) — ringkasan kunjungan & pendapatan
+// Dijadwalkan via Vercel Cron (lihat vercel.json): ringkasan kunjungan & pendapatan
 // harian, dikirim ke OWNER/ADMIN_PUSAT setiap malam.
 export async function GET(req: NextRequest) {
   if (!verifyCronSecret(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

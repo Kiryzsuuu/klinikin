@@ -25,7 +25,7 @@ export async function GET() {
   return ok(keys);
 }
 
-// Key asli (raw) hanya dikembalikan sekali di response ini — tidak pernah disimpan/ditampilkan lagi
+// Key asli (raw) hanya dikembalikan sekali di response ini: tidak pernah disimpan/ditampilkan lagi
 export async function POST(req: NextRequest) {
   const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;

@@ -26,7 +26,7 @@ const suggestionSchema = z.object({
   disclaimer: z.string().describe("Peringatan bahwa ini hanya saran, keputusan akhir tetap di tangan dokter"),
 });
 
-// Smart Diagnosis Suggestion (PRD 4.2.1) — bukan pengganti keputusan klinis dokter
+// Smart Diagnosis Suggestion (PRD 4.2.1): bukan pengganti keputusan klinis dokter
 export async function POST(req: NextRequest) {
   const g = await scopedGuard(CLINICAL_ROLES);
   if (isError(g)) return g.error;

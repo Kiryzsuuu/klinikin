@@ -145,7 +145,7 @@ export default function GlobalUsersPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-dark">Manajemen User (Global)</h1>
-          <p className="text-dark/60">Kelola semua akun lintas klinik — bisa menambahkan admin baru untuk klinik manapun.</p>
+          <p className="text-dark/60">Kelola semua akun lintas klinik, bisa menambahkan admin baru untuk klinik manapun.</p>
         </div>
         <Button onClick={openCreate}>+ Tambah User</Button>
       </div>

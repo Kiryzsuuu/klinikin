@@ -1,5 +1,5 @@
 // Notifikasi WhatsApp via Fonnte (https://fonnte.com). BUTUH token device WhatsApp
-// yang terhubung di dashboard Fonnte — isi FONNTE_TOKEN di .env.local.
+// yang terhubung di dashboard Fonnte: isi FONNTE_TOKEN di .env.local.
 
 function requireToken() {
   const token = process.env.FONNTE_TOKEN;

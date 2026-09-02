@@ -30,7 +30,7 @@ const userSchema = new Schema(
     isEmailVerified: { type: Boolean, default: false },
     lastLogin: { type: Date },
 
-    // MFA (TOTP) — wajib untuk OWNER & ADMIN_PUSAT sesuai NFR keamanan PRD
+    // MFA (TOTP): wajib untuk OWNER & ADMIN_PUSAT sesuai NFR keamanan PRD
     mfaEnabled: { type: Boolean, default: false },
     mfaSecret: { type: String, default: "" },
     mfaPendingSecret: { type: String, default: "" }, // dipakai selama proses setup, sebelum dikonfirmasi

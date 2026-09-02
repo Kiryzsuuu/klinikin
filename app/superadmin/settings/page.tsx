@@ -169,7 +169,7 @@ export default function SettingsPage() {
           <p className="text-xs text-dark/40 mt-2">
             Gambar latar belakang ditampilkan penuh di belakang halaman utama, di bawah lapisan warna tema. Gambar
             halaman login &amp; daftar ditampilkan di sisi kiri form masuk staf (/login) dan form daftarkan klinik
-            (/register) — kalau belum diisi, sisi kiri menampilkan gradasi warna tema sebagai gantinya.
+            (/register): kalau belum diisi, sisi kiri menampilkan gradasi warna tema sebagai gantinya.
           </p>
         </Card>
 

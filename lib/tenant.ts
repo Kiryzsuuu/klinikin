@@ -14,7 +14,7 @@ import type { SessionPayload } from "@/lib/jwt";
 
 export { isError };
 
-// Batasan fitur selama masa TRIAL — semua modul non-inti terkunci sampai klinik berlangganan.
+// Batasan fitur selama masa TRIAL: semua modul non-inti terkunci sampai klinik berlangganan.
 export const TRIAL_LIMITS = {
   maxBranches: 1,
   maxUsers: 3,
@@ -81,7 +81,7 @@ export async function createTrialClinic(name: string, ownerEmail: string) {
   });
 }
 
-// Cek apakah suatu fitur terkunci untuk sesi ini — dipanggil di setiap route yang mewakili
+// Cek apakah suatu fitur terkunci untuk sesi ini: dipanggil di setiap route yang mewakili
 // satu modul (lihat FEATURE_KEYS). Menggerbang dalam dua lapis independen:
 //  1) Paket langganan klinik (trial vs paket ACTIVE, modul inti selalu terbuka)
 //  2) Role staf dalam klinik itu (dikustomisasi lewat Clinic.settings.rolePermissions)
@@ -114,7 +114,7 @@ export async function requireFeature(
       );
     }
   } else {
-    // Di luar trial, TIDAK ADA modul yang otomatis terbuka — semuanya, termasuk modul inti,
+    // Di luar trial, TIDAK ADA modul yang otomatis terbuka: semuanya, termasuk modul inti,
     // mengikuti persis daftar fitur yang dicentang super admin pada paket klinik ini.
     const plan = clinic.subscription?.planId
       ? await SubscriptionPlan.findById(clinic.subscription.planId)

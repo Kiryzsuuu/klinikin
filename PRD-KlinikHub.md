@@ -1,5 +1,5 @@
 # Product Requirements Document (PRD)
-## KlinikHub — Platform Manajemen Klinik Multi-Cabang
+## KlinikHub: Platform Manajemen Klinik Multi-Cabang
 
 **Versi:** 1.0.0
 **Tanggal:** 31 Agustus 2026
@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary
 
-KlinikHub adalah platform SaaS manajemen klinik berbasis cloud yang dirancang khusus untuk **grup klinik multi-cabang** di Indonesia. Berbeda dari kompetitor seperti MyKlinik, Medisy, dan AIDO yang berfokus pada klinik tunggal, KlinikHub hadir sebagai solusi terintegrasi yang memungkinkan pemilik grup klinik mengelola seluruh cabang dalam satu dashboard terpusat — mulai dari RME, farmasi, keuangan, SDM, hingga analitik bisnis.
+KlinikHub adalah platform SaaS manajemen klinik berbasis cloud yang dirancang khusus untuk **grup klinik multi-cabang** di Indonesia. Berbeda dari kompetitor seperti MyKlinik, Medisy, dan AIDO yang berfokus pada klinik tunggal, KlinikHub hadir sebagai solusi terintegrasi yang memungkinkan pemilik grup klinik mengelola seluruh cabang dalam satu dashboard terpusat, mulai dari RME, farmasi, keuangan, SDM, hingga analitik bisnis.
 
 ### Visi
 > Menjadi platform manajemen kesehatan multi-cabang #1 di Indonesia yang menghubungkan seluruh ekosistem operasional klinik dalam satu sistem cerdas.
@@ -91,13 +91,13 @@ Membantu grup klinik tumbuh lebih cepat dengan teknologi yang mengurangi beban o
 
 ## 4. Scope Produk
 
-### 4.1 Fitur Inti (MVP — Phase 1)
+### 4.1 Fitur Inti (MVP: Phase 1)
 
 #### 4.1.1 Manajemen Multi-Cabang
-- **Dashboard Konsolidasi Owner** — ringkasan semua cabang dalam satu tampilan
-- **Manajemen Cabang** — tambah/edit/nonaktifkan cabang
-- **Role & Permission** — akses berbasis peran per cabang (Owner, Admin Pusat, Admin Cabang, Dokter, Apoteker, Kasir)
-- **Data Pasien Terpusat** — pasien yang pernah berobat di satu cabang otomatis terdaftar di semua cabang
+- **Dashboard Konsolidasi Owner**: ringkasan semua cabang dalam satu tampilan
+- **Manajemen Cabang**: tambah/edit/nonaktifkan cabang
+- **Role & Permission**: akses berbasis peran per cabang (Owner, Admin Pusat, Admin Cabang, Dokter, Apoteker, Kasir)
+- **Data Pasien Terpusat**: pasien yang pernah berobat di satu cabang otomatis terdaftar di semua cabang
 
 #### 4.1.2 Rekam Medis Elektronik (RME)
 - Pendaftaran & antrian pasien
@@ -124,18 +124,18 @@ Membantu grup klinik tumbuh lebih cepat dengan teknologi yang mengurangi beban o
 - Konsolidasi laporan keuangan semua cabang
 
 #### 4.1.5 Integrasi Wajib
-- **SATUSEHAT** (Kemenkes) — auto-push data RME
-- **BPJS PCare** — bridging klaim
-- **BPJS Antrol v2** — antrian online
-- **I-Care** — data pasien JKN
+- **SATUSEHAT** (Kemenkes): auto-push data RME
+- **BPJS PCare**: bridging klaim
+- **BPJS Antrol v2**: antrian online
+- **I-Care**: data pasien JKN
 
 ### 4.2 Fitur Lanjutan (Phase 2)
 
 #### 4.2.1 AI & Otomasi
-- **Voice-to-Text RME** — dokter cukup bicara, sistem transkrip otomatis ke SOAP
-- **Smart Diagnosis Suggestion** — rekomendasi ICD-10 berdasarkan gejala
-- **Prediksi Stok Obat** — AI prediksi kebutuhan obat berdasarkan tren historis
-- **Auto-Summary Rekam Medis** — ringkasan riwayat pasien otomatis sebelum konsultasi
+- **Voice-to-Text RME**: dokter cukup bicara, sistem transkrip otomatis ke SOAP
+- **Smart Diagnosis Suggestion**: rekomendasi ICD-10 berdasarkan gejala
+- **Prediksi Stok Obat**: AI prediksi kebutuhan obat berdasarkan tren historis
+- **Auto-Summary Rekam Medis**: ringkasan riwayat pasien otomatis sebelum konsultasi
 
 #### 4.2.2 HR & Kepegawaian
 - Database pegawai terpusat (dokter, perawat, admin, dll)
@@ -254,22 +254,22 @@ US-009: Sebagai Kasir, saya ingin proses klaim BPJS otomatis dari data RME
 
 ## 8. Go-To-Market Strategy
 
-### Phase 0 — Pre-launch (Bulan 1–3)
+### Phase 0: Pre-launch (Bulan 1–3)
 - Riset mendalam & validasi dengan 10 owner klinik
 - Build MVP core features
 - Rekrut 5 klinik beta tester (free 3 bulan)
 
-### Phase 1 — Soft Launch (Bulan 4–6)
+### Phase 1: Soft Launch (Bulan 4–6)
 - Launch paket Starter & Growth
 - Fokus Jabodetabek & Bandung
 - Kemitraan dengan asosiasi klinik (ASNAKES, PERKESMAS)
 
-### Phase 2 — Scale (Bulan 7–12)
+### Phase 2: Scale (Bulan 7–12)
 - Ekspansi ke kota tier-1 lainnya (Surabaya, Medan, Makassar)
 - Launch fitur AI & Patient Portal
 - Program referral antar klinik
 
-### Phase 3 — National (Bulan 13–24)
+### Phase 3: National (Bulan 13–24)
 - Ekspansi nasional
 - Launch Enterprise plan
 - Integrasi asuransi swasta
@@ -304,28 +304,28 @@ US-009: Sebagai Kasir, saya ingin proses klaim BPJS otomatis dari data RME
 ## 11. Timeline Roadmap
 
 ```
-Q4 2026 — MVP Phase 1
+Q4 2026: MVP Phase 1
 ├── Core RME (SOAP, ICD-10, e-Resep)
 ├── Multi-cabang basic (2–5 cabang)
 ├── Kasir & BPJS integration
 ├── SATUSEHAT integration
 └── Beta launch 5 klinik
 
-Q1 2027 — Phase 2
+Q1 2027: Phase 2
 ├── Dashboard konsolidasi owner
 ├── Manajemen stok antar cabang
 ├── HR dasar (jadwal dokter)
 ├── Patient portal web
 └── Soft launch publik
 
-Q2 2027 — Phase 3
+Q2 2027: Phase 3
 ├── AI Voice-to-Text RME
 ├── AI Diagnosis suggestion
 ├── Mobile app pasien
 ├── BI Dashboard
 └── Growth launch
 
-Q3–Q4 2027 — Phase 4
+Q3–Q4 2027: Phase 4
 ├── Integrasi asuransi swasta
 ├── Modul Lab & Radiologi
 ├── API publik

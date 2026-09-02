@@ -1,4 +1,4 @@
-// Integrasi SATUSEHAT (Kemenkes) — HL7 FHIR R4.
+// Integrasi SATUSEHAT (Kemenkes): HL7 FHIR R4.
 // BUTUH kredensial resmi dari https://satusehat.kemkes.go.id (client_id/client_secret
 // per organisasi terdaftar). Tanpa itu, fungsi di bawah akan melempar error yang jelas
 // alih-alih diam-diam gagal.

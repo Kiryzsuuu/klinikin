@@ -1,7 +1,7 @@
 import { Schema, model, models } from "mongoose";
 
 // "Marketplace obat" disederhanakan jadi pencatatan pengadaan internal (supplier +
-// purchase order manual) — bukan integrasi marketplace/e-procurement pihak ketiga
+// purchase order manual), bukan integrasi marketplace/e-procurement pihak ketiga
 // nyata, karena tidak ada API generik untuk itu.
 const supplierSchema = new Schema(
   {

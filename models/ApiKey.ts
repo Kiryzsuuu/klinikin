@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-// API publik untuk integrasi pihak ketiga — otentikasi via API key (hash tersimpan,
+// API publik untuk integrasi pihak ketiga: otentikasi via API key (hash tersimpan,
 // key asli hanya ditampilkan sekali saat dibuat).
 const apiKeySchema = new Schema(
   {

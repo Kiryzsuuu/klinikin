@@ -41,7 +41,7 @@ type ClinicInfo = {
   trialEndsAt: string | null;
 } | null;
 
-// Menu yang gatenya berupa modul/fitur (lihat lib/features.ts) — key di sini harus cocok
+// Menu yang gatenya berupa modul/fitur (lihat lib/features.ts): key di sini harus cocok
 // dengan feature key yang dipakai requireFeature() di route API-nya masing-masing. Menu
 // administratif (Manajemen Cabang/User, Billing, Site Settings, dst) sengaja tidak dipetakan
 // di sini karena harus selalu bisa diakses.

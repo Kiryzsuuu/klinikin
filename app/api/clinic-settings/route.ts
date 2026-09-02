@@ -5,7 +5,7 @@ import { guard, isError, MANAGE_ROLES } from "@/lib/guard";
 import { ok, fail } from "@/lib/response";
 import { clinicSettingsSchema, validateClinicImages, flattenSettings } from "@/lib/clinicSettings";
 
-// Pengaturan tampilan klinik sendiri (bukan platform) — dibaca/diubah oleh
+// Pengaturan tampilan klinik sendiri (bukan platform): dibaca/diubah oleh
 // OWNER/ADMIN_PUSAT klinik yang login, otomatis di-scope ke klinik mereka sendiri.
 export async function GET() {
   const g = await guard(MANAGE_ROLES);

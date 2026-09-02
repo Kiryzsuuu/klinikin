@@ -7,7 +7,7 @@ import { MANAGE_ROLES } from "@/lib/guard";
 import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
-// Revenue Forecast AI (PRD 4.2.4) — insight naratif berdasarkan tren pendapatan 6 bulan terakhir
+// Revenue Forecast AI (PRD 4.2.4): insight naratif berdasarkan tren pendapatan 6 bulan terakhir
 export async function POST() {
   const g = await scopedGuard(MANAGE_ROLES);
   if (isError(g)) return g.error;
@@ -45,7 +45,7 @@ export async function POST() {
   try {
     const { text } = await generateText({
       model: getAiModel(),
-      prompt: `Berikut data pendapatan bulanan klinik 6 bulan terakhir:\n${trendText}\n\nBuat analisis singkat (3-4 kalimat Bahasa Indonesia): tren naik/turun, proyeksi bulan depan secara kasar, dan satu rekomendasi bisnis. Jangan berikan angka pasti yang terkesan seperti jaminan — gunakan kata seperti "diperkirakan".`,
+      prompt: `Berikut data pendapatan bulanan klinik 6 bulan terakhir:\n${trendText}\n\nBuat analisis singkat (3-4 kalimat Bahasa Indonesia): tren naik/turun, proyeksi bulan depan secara kasar, dan satu rekomendasi bisnis. Jangan berikan angka pasti yang terkesan seperti jaminan, gunakan kata seperti "diperkirakan".`,
     });
 
     return ok({ forecast: text, monthly });

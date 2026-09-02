@@ -241,7 +241,7 @@ export default async function Home() {
               </div>
               <div className="bg-dark/5 py-5 mt-auto">
                 <Link href="/register" className="inline-block px-9 py-2.5 bg-green text-white rounded-md text-sm font-semibold hover:brightness-95">
-                  Coba Gratis
+                  {i === 0 ? "Coba Gratis" : "Pilih Paket"}
                 </Link>
               </div>
             </div>

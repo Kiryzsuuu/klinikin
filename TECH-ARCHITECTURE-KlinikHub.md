@@ -1,5 +1,5 @@
 # Technical Architecture Document
-## KlinikHub — Platform Manajemen Klinik Multi-Cabang
+## KlinikHub: Platform Manajemen Klinik Multi-Cabang
 
 **Versi:** 1.0.0
 **Tanggal:** 31 Agustus 2026
@@ -881,7 +881,7 @@ pnpm run dev
 
 Pipeline:
   1. Lint & Type Check (ESLint + TypeScript)
-  2. Unit Tests (Jest) — coverage minimum 80%
+  2. Unit Tests (Jest): coverage minimum 80%
   3. Integration Tests (Supertest)
   4. Build Docker Images
   5. Push ke ECR (AWS Container Registry)

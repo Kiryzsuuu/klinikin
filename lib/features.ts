@@ -1,7 +1,7 @@
 // Daftar tunggal & global modul/fitur yang bisa dikunci-buka per paket langganan (lewat
 // SubscriptionPlan.features) DAN per role staf dalam satu klinik (lewat
 // Clinic.settings.rolePermissions). Setiap key di sini harus punya pengecekan requireFeature()
-// yang cocok di route API-nya (lihat lib/tenant.ts) — menambah entri di sini saja tidak
+// yang cocok di route API-nya (lihat lib/tenant.ts): menambah entri di sini saja tidak
 // otomatis menggerbang apa pun.
 export const FEATURE_KEYS = [
   { key: "patients", label: "Data Pasien / RME" },
@@ -27,7 +27,7 @@ export const FEATURE_LABELS: Record<string, string> = Object.fromEntries(
 );
 
 // Modul inti yang selalu terbuka untuk trial (demonstrasi produk) dan tidak digerbang oleh
-// pilihan paket sama sekali — hanya modul "ekstra" di bawah ini yang mengikuti paket.
+// pilihan paket sama sekali, hanya modul "ekstra" di bawah ini yang mengikuti paket.
 export const CORE_FEATURES: FeatureKey[] = ["patients", "pharmacy", "cashier", "booking"];
 
 // Fitur yang terkunci khusus selama masa TRIAL (dibuka penuh begitu berlangganan, lalu
@@ -41,7 +41,7 @@ export const TRIAL_DISABLED_FEATURES: FeatureKey[] = FEATURE_KEY_VALUES.filter(
 export const CONFIGURABLE_ROLES = ["ADMIN_CABANG", "DOKTER", "PERAWAT", "APOTEKER", "KASIR"] as const;
 export type ConfigurableRole = (typeof CONFIGURABLE_ROLES)[number];
 
-// Default akses per role sebelum klinik mengustomisasi rolePermissions sendiri — dipilih
+// Default akses per role sebelum klinik mengustomisasi rolePermissions sendiri: dipilih
 // supaya perilaku tidak berubah dari sebelumnya (role klinis dapat modul klinis, apoteker
 // dapat farmasi, kasir dapat kasir, dst).
 export const DEFAULT_ROLE_FEATURES: Record<ConfigurableRole, FeatureKey[]> = {

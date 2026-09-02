@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-// Booking publik dari Patient Portal — belum butuh akun pasien terpisah,
+// Booking publik dari Patient Portal: belum butuh akun pasien terpisah,
 // cukup nama + kontak. Admin/cabang mengonfirmasi lalu mengonversinya jadi Visit.
 const bookingSchema = new Schema(
   {

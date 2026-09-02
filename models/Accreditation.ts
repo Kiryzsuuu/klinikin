@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-// Checklist akreditasi klinik — item disiapkan manual oleh admin sesuai standar
+// Checklist akreditasi klinik: item disiapkan manual oleh admin sesuai standar
 // akreditasi yang berlaku (mis. standar Kemenkes), bukan diimpor dari sumber resmi.
 const accreditationItemSchema = new Schema(
   {

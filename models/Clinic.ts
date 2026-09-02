@@ -21,7 +21,7 @@ const clinicSchema = new Schema(
     // sini memakai DEFAULT_ROLE_FEATURES dari lib/features.ts. OWNER/ADMIN_PUSAT selalu full akses.
     rolePermissions: { type: Schema.Types.Mixed, default: {} },
 
-    // Kustomisasi halaman publik klinik (/c/[slug]) — diatur oleh klinik sendiri
+    // Kustomisasi halaman publik klinik (/c/[slug]): diatur oleh klinik sendiri
     // (OWNER/ADMIN_PUSAT) atau oleh super admin, TIDAK global lintas klinik.
     settings: {
       tagline: { type: String, default: "Klinik kepercayaan keluarga Anda" },

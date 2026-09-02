@@ -6,7 +6,7 @@ import { ok, fail } from "@/lib/response";
 
 type Params = { params: Promise<{ roomId: string }> };
 
-// Signaling WebRTC lewat polling dokumen Mongo — tidak perlu provider video call
+// Signaling WebRTC lewat polling dokumen Mongo: tidak perlu provider video call
 // pihak ketiga. Media stream tetap P2P langsung antar browser (via STUN publik).
 export async function GET(_req: NextRequest, { params }: Params) {
   const { roomId } = await params;

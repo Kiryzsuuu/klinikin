@@ -237,7 +237,7 @@ export default function PlansPage() {
                   ))}
                 </div>
                 <p className="text-xs text-dark/40 mt-1">
-                  Hanya modul yang dicentang yang terbuka untuk klinik dengan paket ini — tidak ada yang otomatis
+                  Hanya modul yang dicentang yang terbuka untuk klinik dengan paket ini, tidak ada yang otomatis
                   terbuka, termasuk modul inti (RME, farmasi, kasir, booking). Selama trial, modul inti tetap
                   terbuka otomatis tanpa perlu paket.
                 </p>

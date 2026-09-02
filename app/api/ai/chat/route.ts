@@ -6,7 +6,7 @@ import { requireFeature } from "@/lib/tenant";
 export const maxDuration = 30;
 
 // Asisten chat AI internal untuk staf klinik (tanya seputar SOP, ICD-10, dsb).
-// Bukan pengganti keputusan medis — instruksi sistem menegaskan itu.
+// Bukan pengganti keputusan medis, instruksi sistem menegaskan itu.
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) return new Response("Unauthorized", { status: 401 });

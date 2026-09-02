@@ -1,6 +1,6 @@
 import { Schema, model, models } from "mongoose";
 
-// Modul Laboratorium & Radiologi (LIS/RIS) dasar — hasil disimpan sebagai
+// Modul Laboratorium & Radiologi (LIS/RIS) dasar: hasil disimpan sebagai
 // teks + file (PDF/gambar) base64, bukan integrasi alat lab fisik.
 const labOrderSchema = new Schema(
   {

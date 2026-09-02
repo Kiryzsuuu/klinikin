@@ -1,6 +1,6 @@
 // Integrasi BPJS PCare v2. BUTUH Cons ID + Secret Key resmi dari BPJS Kesehatan
 // (pengajuan lewat https://trkendali.bpjs-kesehatan.go.id). BPJS API juga mewajibkan
-// signature HMAC-SHA256 per request — di bawah ini kerangka dasarnya saja.
+// signature HMAC-SHA256 per request; di bawah ini kerangka dasarnya saja.
 import crypto from "crypto";
 
 function requireConfig() {

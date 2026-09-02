@@ -14,7 +14,7 @@ const schema = z.object({
 
 type Params = { params: Promise<{ id: string }> };
 
-// Tambah batch baru (mis. setelah barang diterima) — otomatis menambah stok total & terekam
+// Tambah batch baru (mis. setelah barang diterima): otomatis menambah stok total & terekam
 // untuk alert kadaluarsa
 export async function POST(req: NextRequest, { params }: Params) {
   const g = await scopedGuard(PHARMACY_ROLES);

@@ -5,7 +5,7 @@ import { User } from "@/models/User";
 import { sendMail } from "@/lib/mailer";
 import { verifyCronSecret } from "@/lib/cronAuth";
 
-// Dijadwalkan via Vercel Cron (lihat vercel.json) — cek stok kritis & obat mendekati
+// Dijadwalkan via Vercel Cron (lihat vercel.json): cek stok kritis & obat mendekati
 // kadaluarsa (<=30 hari), kirim email ringkasan ke OWNER/ADMIN_PUSAT.
 export async function GET(req: NextRequest) {
   if (!verifyCronSecret(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

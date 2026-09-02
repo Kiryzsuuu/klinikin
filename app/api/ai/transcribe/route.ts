@@ -5,7 +5,7 @@ import { CLINICAL_ROLES } from "@/lib/guard";
 import { scopedGuard, isError } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
-// Voice-to-Text RME (PRD 4.2.1) — dokter rekam suara, ditranskrip otomatis lewat
+// Voice-to-Text RME (PRD 4.2.1): dokter rekam suara, ditranskrip otomatis lewat
 // Groq Whisper untuk mengisi kolom Subjective (SOAP).
 export async function POST(req: NextRequest) {
   const g = await scopedGuard(CLINICAL_ROLES);

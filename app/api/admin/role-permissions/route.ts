@@ -7,7 +7,7 @@ import { ok, fail } from "@/lib/response";
 import { audit } from "@/lib/audit";
 import { CONFIGURABLE_ROLES, DEFAULT_ROLE_FEATURES, FEATURE_KEY_VALUES } from "@/lib/features";
 
-// Akses fitur per role staf dalam klinik yang login — hanya OWNER/ADMIN_PUSAT klinik itu sendiri
+// Akses fitur per role staf dalam klinik yang login: hanya OWNER/ADMIN_PUSAT klinik itu sendiri
 // yang boleh mengatur (bukan lintas klinik, beda dari paket langganan yang diatur super admin).
 const updateSchema = z.object(
   Object.fromEntries(CONFIGURABLE_ROLES.map((r) => [r, z.array(z.enum(FEATURE_KEY_VALUES)).optional()]))

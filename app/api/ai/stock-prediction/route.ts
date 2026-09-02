@@ -17,7 +17,7 @@ const predictionSchema = z.object({
   reasoning: z.string().describe("Alasan singkat berdasarkan tren penjualan dan stok saat ini"),
 });
 
-// Prediksi Stok Obat (PRD 4.2.1) — berdasarkan tren penjualan 30 hari terakhir dari invoice
+// Prediksi Stok Obat (PRD 4.2.1): berdasarkan tren penjualan 30 hari terakhir dari invoice
 export async function POST(req: NextRequest) {
   const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;

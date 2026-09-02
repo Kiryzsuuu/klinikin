@@ -4,8 +4,8 @@ import { connectDB } from "../lib/db";
 import { SubscriptionPlan } from "../models/SubscriptionPlan";
 
 // Fitur premium diperluas dari 5 key ke 8 key (tambah lab/hr/accreditation). Skrip ini
-// menaikkan paket default (starter/pro/enterprise) yang MASIH memakai salah satu bentuk lama —
-// baik teks marketing bebas dari sebelum migrasi pertama, atau 5-key hasil migrasi pertama —
+// menaikkan paket default (starter/pro/enterprise) yang MASIH memakai salah satu bentuk lama,
+// baik teks marketing bebas dari sebelum migrasi pertama, atau 5-key hasil migrasi pertama,
 // ke default baru. Paket yang sudah dikustomisasi manual lewat UI (kombinasi fitur lain) TIDAK
 // disentuh sama sekali.
 const OLD_MARKETING_TEXT = new Set([
@@ -43,7 +43,7 @@ async function main() {
     const isOldMarketing = current.some((f) => OLD_MARKETING_TEXT.has(f));
     const isPreviousMigration = sameSet(current, PREVIOUS_MIGRATION[slug]);
     if (!isOldMarketing && !isPreviousMigration) {
-      console.log(`Lewati "${slug}" — sudah dikustomisasi manual: [${current.join(", ") || "-"}]`);
+      console.log(`Lewati "${slug}", sudah dikustomisasi manual: [${current.join(", ") || "-"}]`);
       continue;
     }
 
