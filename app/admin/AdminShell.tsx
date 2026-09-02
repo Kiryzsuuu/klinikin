@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -76,10 +77,12 @@ function daysLeft(dateStr: string | null) {
 export default function AdminShell({
   user,
   clinic,
+  theme,
   children,
 }: {
   user: SessionUser;
   clinic: ClinicInfo;
+  theme?: { primaryColor?: string; secondaryColor?: string; darkColor?: string };
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -96,7 +99,16 @@ export default function AdminShell({
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div
+      className="flex h-screen w-full overflow-hidden"
+      style={
+        {
+          "--color-green": theme?.primaryColor || "#1B686B",
+          "--color-lime": theme?.secondaryColor || "#1B686B",
+          "--color-dark": theme?.darkColor || "#406661",
+        } as CSSProperties
+      }
+    >
       {/* Sidebar */}
       <aside
         className={`fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 h-screen w-64 shrink-0 bg-dark text-white flex flex-col transition-transform ${

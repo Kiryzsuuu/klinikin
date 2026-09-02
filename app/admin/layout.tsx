@@ -34,6 +34,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             }
           : null
       }
+      theme={clinic?.settings?.theme}
     >
       {children}
     </AdminShell>

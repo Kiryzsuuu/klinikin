@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
@@ -15,9 +16,11 @@ const NAV: { href: string; label: string; icon: LucideIcon }[] = [
 
 export default function SuperAdminShell({
   user,
+  theme,
   children,
 }: {
   user: { name: string; email: string };
+  theme?: { primaryColor?: string; secondaryColor?: string; darkColor?: string };
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -31,7 +34,16 @@ export default function SuperAdminShell({
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div
+      className="flex h-screen w-full overflow-hidden"
+      style={
+        {
+          "--color-green": theme?.primaryColor || "#1B686B",
+          "--color-lime": theme?.secondaryColor || "#1B686B",
+          "--color-dark": theme?.darkColor || "#406661",
+        } as CSSProperties
+      }
+    >
       <aside
         className={`fixed lg:sticky lg:top-0 inset-y-0 left-0 z-40 h-screen w-64 shrink-0 bg-dark text-white flex flex-col transition-transform ${
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
