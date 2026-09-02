@@ -117,7 +117,7 @@ export default function AdminShell({
                 key={item.href}
                 href={locked ? "/admin/billing" : item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border-l-2 transition ${
+                className={`flex items-center justify-between gap-2 px-4 py-2.5 rounded-sm border-l-2 transition ${
                   active
                     ? "bg-green text-white border-lime"
                     : "text-white/70 border-transparent hover:bg-white/10 hover:text-white"
@@ -161,7 +161,7 @@ export default function AdminShell({
           </div>
           <button
             onClick={logout}
-            className="w-full text-sm bg-white/10 hover:bg-white/20 rounded-xl py-2 cursor-pointer"
+            className="w-full text-sm bg-white/10 hover:bg-white/20 rounded-sm py-2 cursor-pointer"
           >
             Keluar
           </button>
@@ -186,7 +186,7 @@ export default function AdminShell({
         </header>
         {isTrial && (
           <div className="px-6 lg:px-8 pt-4">
-            <div className="bg-lime/30 border border-lime text-dark text-sm rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="bg-lime/30 border border-lime text-dark text-sm rounded-sm px-4 py-3 flex flex-wrap items-center justify-between gap-2">
               <span>
                 Anda sedang di masa trial{trialDays !== null ? `, ${trialDays} hari tersisa` : ""}. Sebagian fitur
                 terkunci.
@@ -199,7 +199,7 @@ export default function AdminShell({
         )}
         {isBlocked && (
           <div className="px-6 lg:px-8 pt-4">
-            <div className="bg-red-100 border border-red-300 text-red-800 text-sm rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="bg-red-100 border border-red-300 text-red-800 text-sm rounded-sm px-4 py-3 flex flex-wrap items-center justify-between gap-2">
               <span>Langganan Anda tidak aktif. Perbarui langganan untuk terus menggunakan KlinikKita.</span>
               <Link href="/admin/billing" className="font-semibold underline shrink-0">
                 Perbarui sekarang

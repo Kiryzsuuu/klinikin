@@ -21,7 +21,7 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
   const s = clinic.settings;
   const heroTitle = s?.hero?.title || clinic.name;
   const primary = s?.theme?.primaryColor || "#57D131";
-  const secondary = s?.theme?.secondaryColor || "#B9E937";
+  const secondary = s?.theme?.secondaryColor || "#9EF40B";
   const darkColor = s?.theme?.darkColor || "#406661";
 
   return (
@@ -68,7 +68,7 @@ export default async function ClinicPublicPage({ params }: { params: Promise<{ s
         <div className="max-w-2xl w-full mx-6 mb-12 lg:mb-16 bg-white/95 px-8 py-10 text-center shadow-2xl" style={{ borderTop: `4px solid ${primary}` }}>
           {s?.tagline && (
             <span
-              className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5"
+              className="inline-block px-4 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider mb-5"
               style={{ background: `${secondary}55`, color: darkColor }}
             >
               {s.tagline}

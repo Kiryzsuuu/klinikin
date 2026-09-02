@@ -260,7 +260,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
             <Link
               href={`/admin/patients/${id}/visits/${v._id}/print`}
               target="_blank"
-              className="inline-block px-3 py-1.5 text-xs rounded-2xl border border-dark/20 text-dark/70 hover:bg-dark/5 mb-2"
+              className="inline-block px-3 py-1.5 text-xs rounded-sm border border-dark/20 text-dark/70 hover:bg-dark/5 mb-2"
             >
               Cetak Resep/Rujukan
             </Link>
@@ -273,7 +273,7 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                     <VoiceRecorder onTranscript={(text) => setSubjective((prev) => (prev ? `${prev} ${text}` : text))} />
                   </div>
                   <textarea
-                    className="w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
+                    className="w-full px-4 py-2.5 rounded-sm border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
                     rows={2}
                     placeholder="Contoh: demam 2 hari, batuk berdahak, nyeri tenggorokan (atau gunakan tombol rekam suara)"
                     value={subjective}
@@ -309,24 +309,24 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                   >
                     Resep & Rujukan
                   </Button>
-                  <label className="px-3 py-1.5 text-xs rounded-2xl border border-dark/20 text-dark/70 hover:bg-dark/5 cursor-pointer">
+                  <label className="px-3 py-1.5 text-xs rounded-sm border border-dark/20 text-dark/70 hover:bg-dark/5 cursor-pointer">
                     Lampirkan Foto/Dokumen
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => addAttachment(v, e.target.files?.[0])} />
                   </label>
                 </div>
 
                 {openChart?.visitId === v._id && openChart.type === "dental" && (
-                  <div className="bg-bg rounded-2xl p-4">
+                  <div className="bg-bg rounded-sm p-4">
                     <Odontogram initial={v.dentalChart || []} onSave={(chart) => saveDentalChart(v._id, chart)} />
                   </div>
                 )}
                 {openChart?.visitId === v._id && openChart.type === "skin" && (
-                  <div className="bg-bg rounded-2xl p-4">
+                  <div className="bg-bg rounded-sm p-4">
                     <SkinChart initial={v.skinChart || []} onSave={(entries) => saveSkinChart(v._id, entries)} />
                   </div>
                 )}
                 {openRx === v._id && (
-                  <div className="bg-bg rounded-2xl p-4">
+                  <div className="bg-bg rounded-sm p-4">
                     <PrescriptionEditor
                       initialMeds={v.plan?.medications || []}
                       initialReferral={v.plan?.referral}
@@ -336,10 +336,10 @@ export default function PatientDetailPage({ params }: { params: Promise<{ id: st
                 )}
 
                 {activeVisit === v._id && suggestions.length > 0 && (
-                  <div className="space-y-2 bg-bg rounded-2xl p-4">
+                  <div className="space-y-2 bg-bg rounded-sm p-4">
                     <p className="text-xs text-dark/50">Saran AI, bukan diagnosis final. Dokter tetap yang memutuskan.</p>
                     {suggestions.map((s, i) => (
-                      <div key={i} className="flex items-center justify-between gap-3 bg-white rounded-xl p-3">
+                      <div key={i} className="flex items-center justify-between gap-3 bg-white rounded-sm p-3">
                         <div>
                           <p className="font-medium text-dark text-sm">{s.icdCode} - {s.icdDescription}</p>
                           <p className="text-xs text-dark/50">{s.reasoning}</p>

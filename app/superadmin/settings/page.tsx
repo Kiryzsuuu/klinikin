@@ -114,7 +114,7 @@ export default function SettingsPage() {
           <div className="mt-4">
             <Label>Deskripsi</Label>
             <textarea
-              className="w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
+              className="w-full px-4 py-2.5 rounded-sm border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
               rows={3}
               value={settings.description}
               onChange={(e) => update("description", e.target.value)}
@@ -266,9 +266,9 @@ function ImagePicker({ label, value, onChange }: { label: string; value: string;
       <Label>{label}</Label>
       <div className="flex items-center gap-3">
         {value ? (
-          <Image src={value} alt={label} width={48} height={48} unoptimized className="rounded-xl object-cover w-12 h-12 border border-dark/10" />
+          <Image src={value} alt={label} width={48} height={48} unoptimized className="rounded-sm object-cover w-12 h-12 border border-dark/10" />
         ) : (
-          <div className="w-12 h-12 rounded-xl bg-bg border border-dark/10" />
+          <div className="w-12 h-12 rounded-sm bg-bg border border-dark/10" />
         )}
         <input type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0])} className="text-xs" />
       </div>

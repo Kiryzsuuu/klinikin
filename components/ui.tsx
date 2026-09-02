@@ -15,7 +15,7 @@ export function Button({
   };
   return (
     <button
-      className={`px-5 py-2.5 rounded-2xl font-medium transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${styles[variant]} ${className}`}
+      className={`px-5 py-2.5 rounded font-semibold tracking-wide transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${styles[variant]} ${className}`}
       {...props}
     />
   );
@@ -24,7 +24,7 @@ export function Button({
 export function Input({ className = "", ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
-      className={`w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50 ${className}`}
+      className={`w-full px-4 py-2.5 rounded-sm border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50 ${className}`}
       {...props}
     />
   );
@@ -33,7 +33,7 @@ export function Input({ className = "", ...props }: InputHTMLAttributes<HTMLInpu
 export function Select({ className = "", children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
-      className={`w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50 ${className}`}
+      className={`w-full px-4 py-2.5 rounded-sm border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50 ${className}`}
       {...props}
     >
       {children}
@@ -47,7 +47,7 @@ export function Label({ className = "", ...props }: LabelHTMLAttributes<HTMLLabe
 
 export function Card({ className = "", children }: { className?: string; children: ReactNode }) {
   return (
-    <div className={`bg-white rounded-3xl shadow-sm border border-dark/5 p-6 ${className}`}>{children}</div>
+    <div className={`bg-white rounded-sm shadow-[0px_0_25px_rgba(0,0,0,0.06)] border border-dark/5 p-6 ${className}`}>{children}</div>
   );
 }
 
@@ -58,5 +58,5 @@ export function Badge({ children, tone = "green" }: { children: ReactNode; tone?
     gray: "bg-dark/10 text-dark/70",
     red: "bg-red-100 text-red-600",
   };
-  return <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${tones[tone]}`}>{children}</span>;
+  return <span className={`px-2.5 py-1 rounded-sm text-xs font-semibold ${tones[tone]}`}>{children}</span>;
 }

@@ -109,7 +109,7 @@ export default async function Home() {
         }
       >
         <div className="max-w-2xl w-full mx-6 mb-12 lg:mb-16 bg-white/95 border-t-4 border-green px-8 py-10 text-center shadow-2xl">
-          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-5 bg-lime/40 text-dark">
+          <span className="inline-block px-4 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider mb-5 bg-lime/40 text-dark">
             {settings.tagline}
           </span>
           <h1 className="text-3xl lg:text-4xl font-bold text-dark leading-tight mb-4">{settings.hero.title}</h1>

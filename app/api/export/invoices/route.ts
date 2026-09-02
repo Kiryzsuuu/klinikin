@@ -1,13 +1,15 @@
 import { connectDB } from "@/lib/db";
 import { Invoice } from "@/models/Invoice";
 import { CASHIER_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { toCsv, csvResponse } from "@/lib/csv";
 
 export async function GET() {
   const g = await scopedGuard(CASHIER_ROLES);
   if (isError(g)) return g.error;
-  const { clinicFilter } = g;
+  const { session, clinicFilter } = g;
+  const featureError = await requireFeature(session, "export");
+  if (featureError) return featureError;
 
   await connectDB();
   const invoices = await Invoice.find({ ...clinicFilter })

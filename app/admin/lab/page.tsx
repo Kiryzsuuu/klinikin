@@ -154,7 +154,7 @@ export default function LabPage() {
                   )}
                 </div>
                 <textarea
-                  className="w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
+                  className="w-full px-4 py-2.5 rounded-sm border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
                   rows={2}
                   placeholder="Hasil pemeriksaan..."
                   value={resultDraft[o._id] ?? ""}

@@ -25,7 +25,7 @@ const clinicSchema = new Schema(
       backgroundImageBase64: { type: String, default: "" },
       theme: {
         primaryColor: { type: String, default: "#57D131" },
-        secondaryColor: { type: String, default: "#B9E937" },
+        secondaryColor: { type: String, default: "#9EF40B" },
         darkColor: { type: String, default: "#406661" },
       },
       hero: {

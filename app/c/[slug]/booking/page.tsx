@@ -101,7 +101,7 @@ export default function BookingPage({ params }: { params: Promise<{ slug: string
           <div>
             <Label>Keluhan</Label>
             <textarea
-              className="w-full px-4 py-2.5 rounded-xl border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
+              className="w-full px-4 py-2.5 rounded-sm border border-dark/15 bg-white focus:outline-none focus:ring-2 focus:ring-green/50"
               rows={3}
               value={form.complaint}
               onChange={(e) => setForm({ ...form, complaint: e.target.value })}

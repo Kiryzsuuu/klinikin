@@ -108,7 +108,7 @@ export default function CashierPage() {
           <p className="text-dark/60">Buat invoice dan kelola pembayaran.</p>
         </div>
         <div className="flex gap-2">
-          <a href="/api/export/invoices" className="px-4 py-2.5 rounded-2xl border border-dark/15 text-dark/70 hover:bg-dark/5 text-sm font-medium">
+          <a href="/api/export/invoices" className="px-4 py-2.5 rounded-sm border border-dark/15 text-dark/70 hover:bg-dark/5 text-sm font-medium">
             Export CSV
           </a>
           <Button onClick={() => setShowForm(true)}>+ Invoice Baru</Button>

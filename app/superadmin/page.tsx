@@ -37,7 +37,7 @@ export default async function SuperAdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (
           <Card key={s.label} className="flex items-center gap-4">
-            <div className={`w-12 h-12 rounded-2xl ${s.tone} flex items-center justify-center text-white font-bold text-lg shrink-0`}>
+            <div className={`w-12 h-12 rounded-sm ${s.tone} flex items-center justify-center text-white font-bold text-lg shrink-0`}>
               {s.value}
             </div>
             <div>

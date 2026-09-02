@@ -122,7 +122,7 @@ export default function ApiKeysPage() {
               <>
                 <h2 className="text-xl font-semibold text-dark mb-2">API Key Dibuat</h2>
                 <p className="text-sm text-red-500 mb-3">Salin sekarang, key ini tidak akan ditampilkan lagi.</p>
-                <div className="bg-bg rounded-xl p-3 font-mono text-sm break-all mb-4">{newKey}</div>
+                <div className="bg-bg rounded-sm p-3 font-mono text-sm break-all mb-4">{newKey}</div>
                 <Button onClick={() => { setShowForm(false); setNewKey(""); }} className="w-full">Selesai</Button>
               </>
             ) : (

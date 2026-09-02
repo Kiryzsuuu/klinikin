@@ -1,6 +1,7 @@
 import { convertToModelMessages, streamText, UIMessage } from "ai";
 import { getAiModel } from "@/lib/ai";
 import { getSession } from "@/lib/auth";
+import { requireFeature } from "@/lib/tenant";
 
 export const maxDuration = 30;
 
@@ -9,6 +10,8 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) return new Response("Unauthorized", { status: 401 });
+  const featureError = await requireFeature(session, "ai");
+  if (featureError) return featureError;
 
   const { messages }: { messages: UIMessage[] } = await req.json();
 

@@ -139,8 +139,8 @@ export default function CallPage({ params }: { params: Promise<{ roomId: string 
         <p className="text-dark/50 text-sm mb-4">Room: {roomId} · {status}</p>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <video ref={localVideoRef} autoPlay muted playsInline className="w-full aspect-video bg-black rounded-2xl object-cover" />
-          <video ref={remoteVideoRef} autoPlay playsInline className="w-full aspect-video bg-black rounded-2xl object-cover" />
+          <video ref={localVideoRef} autoPlay muted playsInline className="w-full aspect-video bg-black rounded-sm object-cover" />
+          <video ref={remoteVideoRef} autoPlay playsInline className="w-full aspect-video bg-black rounded-sm object-cover" />
         </div>
 
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}

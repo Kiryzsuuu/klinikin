@@ -1,5 +1,6 @@
 import { guard, isError } from "@/lib/guard";
 import { fail } from "@/lib/response";
+import { connectDB } from "@/lib/db";
 import { Clinic } from "@/models/Clinic";
 import type { SessionPayload } from "@/lib/jwt";
 
@@ -74,6 +75,7 @@ export async function requireFeature(
 ): Promise<ReturnType<typeof fail> | null> {
   if (session.role === "SUPER_ADMIN") return null;
 
+  await connectDB();
   const clinic = await Clinic.findById(session.clinicId);
   if (!clinic) return fail("CLINIC_NOT_FOUND", "Klinik tidak ditemukan", 404);
 

@@ -50,7 +50,7 @@ export default function SuperAdminShell({
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center px-4 py-2.5 rounded-xl border-l-2 transition ${
+                className={`flex items-center px-4 py-2.5 rounded-sm border-l-2 transition ${
                   active
                     ? "bg-green text-white border-lime"
                     : "text-white/70 border-transparent hover:bg-white/10 hover:text-white"
@@ -70,7 +70,7 @@ export default function SuperAdminShell({
           </div>
           <button
             onClick={logout}
-            className="w-full text-sm bg-white/10 hover:bg-white/20 rounded-xl py-2 cursor-pointer"
+            className="w-full text-sm bg-white/10 hover:bg-white/20 rounded-sm py-2 cursor-pointer"
           >
             Keluar
           </button>

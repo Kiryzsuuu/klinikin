@@ -3,7 +3,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/db";
 import { PurchaseOrder, generatePoNo } from "@/models/Procurement";
 import { PHARMACY_ROLES } from "@/lib/guard";
-import { scopedGuard, isError } from "@/lib/tenant";
+import { scopedGuard, isError, requireFeature } from "@/lib/tenant";
 import { ok, fail } from "@/lib/response";
 
 const itemSchema = z.object({ medicineName: z.string(), quantity: z.number().positive(), unitPrice: z.number().min(0) });
@@ -17,7 +17,9 @@ const createSchema = z.object({
 export async function GET(req: NextRequest) {
   const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
-  const { clinicFilter } = g;
+  const { session: sessionGet, clinicFilter } = g;
+  const featureErrorGet = await requireFeature(sessionGet, "procurement");
+  if (featureErrorGet) return featureErrorGet;
 
   await connectDB();
   const { searchParams } = new URL(req.url);
@@ -37,6 +39,8 @@ export async function POST(req: NextRequest) {
   const g = await scopedGuard(PHARMACY_ROLES);
   if (isError(g)) return g.error;
   const { session } = g;
+  const featureError = await requireFeature(session, "procurement");
+  if (featureError) return featureError;
 
   const parsed = createSchema.safeParse(await req.json());
   if (!parsed.success) return fail("VALIDATION_ERROR", "Data tidak valid", 422, parsed.error.flatten());
