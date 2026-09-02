@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -68,8 +69,19 @@ export default async function Home() {
     );
   }
 
+  const theme = settings.theme || {};
+
   return (
-    <main className="flex-1">
+    <main
+      className="flex-1"
+      style={
+        {
+          "--color-green": theme.primaryColor || "#57D131",
+          "--color-lime": theme.secondaryColor || "#9EF40B",
+          "--color-dark": theme.darkColor || "#406661",
+        } as CSSProperties
+      }
+    >
       <header className="sticky top-0 z-30 bg-white shadow-[0px_0_18px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-between px-6 lg:px-16 py-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
