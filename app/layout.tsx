@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { connectDB } from "@/lib/db";
 import { getOrCreateSettings } from "@/models/SiteSettings";
@@ -23,7 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="id" className={`${jakarta.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-bg text-dark">{children}</body>
+      <body className="min-h-full flex flex-col bg-bg text-dark">
+        <NextTopLoader color="#1B686B" showSpinner={false} height={3} />
+        {children}
+      </body>
     </html>
   );
 }

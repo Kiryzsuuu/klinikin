@@ -25,6 +25,15 @@ import { FEATURE_LABELS } from "@/lib/features";
 
 export const dynamic = "force-dynamic";
 
+type Plan = {
+  _id: string;
+  name: string;
+  priceMonthly: number;
+  maxBranches: number;
+  maxUsers: number;
+  features: string[];
+};
+
 const HIGHLIGHTS = [
   { icon: Stethoscope, title: "RME Lengkap", desc: "Rekam medis elektronik dengan odontogram, skin chart, dan rujukan digital." },
   { icon: Pill, title: "Farmasi & Stok", desc: "Kelola stok obat multi-cabang, batch, dan transfer antar cabang secara real-time." },
@@ -48,10 +57,15 @@ const STATS = [
 
 export default async function Home() {
   await connectDB();
-  const [settings, plans] = await Promise.all([
+  const [settingsDoc, plansDocs] = await Promise.all([
     getOrCreateSettings(),
     SubscriptionPlan.find({ isActive: true }).sort({ priceMonthly: 1 }),
   ]);
+  // Serialisasi ke plain object: dokumen Mongoose punya referensi internal (parent,
+  // schema) yang bikin serializer React Server Components stack overflow kalau dilempar
+  // langsung ke Client Component (Faq di bawah menerima settings.faqs).
+  const settings = JSON.parse(JSON.stringify(settingsDoc));
+  const plans: Plan[] = JSON.parse(JSON.stringify(plansDocs));
 
   if (settings.features?.maintenanceMode) {
     return (
